@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Features{% endblock %}
+
+{% block extra_styles %}
+.page-wrap { padding: 80px 60px; max-width: 1200px; margin: 0 auto; }
+
+.page-hero { text-align: center; margin-bottom: 70px; }
+.page-label { font-size: 0.78rem; font-weight: 600; color: var(--purple-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+.page-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+.page-title .gradient { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 1rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+.feature-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+    border-color: var(--purple);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(124,58,237,0.15);
+}
+
+.feature-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #3b0764, #5b21b6);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+}
+
+.feature-title { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.feature-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; }
+
+@media (max-width: 768px) { .page-wrap { padding: 60px 24px; } }
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+    <div class="page-hero">
+        <div class="page-label">Why LibraSpace</div>
+        <h1 class="page-title">Everything you need to<br><span class="gradient">manage your reading</span></h1>
+        <p class="page-sub">A seamless experience from browsing to booking — built for modern readers.</p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📖</div>
+            <div class="feature-title">Easy Book Browsing</div>
+            <div class="feature-desc">Browse our full collection of books with a clean, intuitive interface designed for speed and simplicity.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔖</div>
+            <div class="feature-title">Instant Reservations</div>
+            <div class="feature-desc">Reserve any book in one click. Your booking is confirmed instantly — no waiting, no paperwork.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <div class="feature-title">Secure Accounts</div>
+            <div class="feature-desc">Your account and reading history are protected with secure authentication and private sessions.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <div class="feature-title">Mobile Friendly</div>
+            <div class="feature-desc">Access LibraSpace from any device — desktop, tablet, or phone. Fully responsive design.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-title">Fast & Reliable</div>
+            <div class="feature-desc">Powered by a cloud database for lightning-fast performance and 99.9% uptime availability.</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🌙</div>
+            <div class="feature-title">Dark Mode Design</div>
+            <div class="feature-desc">A beautiful dark purple interface that's easy on the eyes — perfect for late-night reading sessions.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Contact{% endblock %}
+
+{% block extra_styles %}
+.page-wrap { padding: 80px 60px; max-width: 900px; margin: 0 auto; }
+
+.page-hero { text-align: center; margin-bottom: 60px; }
+.page-label { font-size: 0.78rem; font-weight: 600; color: var(--purple-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+.page-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+.page-title .gradient { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 1rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+.contact-wrap { display: grid; grid-template-columns: 1fr 1.6fr; gap: 30px; align-items: start; }
+
+.contact-info { display: flex; flex-direction: column; gap: 16px; }
+
+.info-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.2s;
+}
+
+.info-card:hover { border-color: var(--purple); }
+.info-icon { font-size: 1.5rem; width: 44px; height: 44px; background: linear-gradient(135deg, #3b0764, #5b21b6); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.info-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.info-value { font-size: 0.9rem; font-weight: 500; color: var(--text); }
+
+.contact-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+}
+
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.contact-full { grid-column: 1 / -1; }
+
+.form-group { display: flex; flex-direction: column; gap: 7px; }
+
+label { font-size: 0.78rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.6px; }
+
+input, textarea {
+    padding: 12px 16px;
+    background: #240f3d;
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: none;
+}
+
+input::placeholder, textarea::placeholder { color: #4a3a6a; }
+input:focus, textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.18); }
+
+.btn-submit {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+}
+
+.btn-submit:hover { opacity: 0.88; transform: translateY(-2px); }
+
+@media (max-width: 768px) {
+    .page-wrap { padding: 60px 24px; }
+    .contact-wrap { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+    <div class="page-hero">
+        <div class="page-label">Contact Us</div>
+        <h1 class="page-title">Get in <span class="gradient">touch</span></h1>
+        <p class="page-sub">Have a question or feedback? We'd love to hear from you.</p>
+    </div>
+
+    <div class="contact-wrap">
+        <div class="contact-info">
+            <div class="info-card">
+                <div class="info-icon">📧</div>
+                <div>
+                    <div class="info-label">Email</div>
+                    <div class="info-value">hello@libraspace.com</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">📍</div>
+                <div>
+                    <div class="info-label">Location</div>
+                    <div class="info-value">Philippines</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">🕐</div>
+                <div>
+                    <div class="info-label">Support Hours</div>
+                    <div class="info-value">Mon–Fri, 9am–5pm</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">💬</div>
+                <div>
+                    <div class="info-label">Response Time</div>
+                    <div class="info-value">Within 24 hours</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-card">
+            <form>
+                <div class="contact-grid">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" placeholder="Juan">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" placeholder="Dela Cruz">
+                    </div>
+                    <div class="form-group contact-full">
+                        <label>Email</label>
+                        <input type="email" placeholder="juan@email.com">
+                    </div>
+                    <div class="form-group contact-full">
+                        <label>Subject</label>
+                        <input type="text" placeholder="How can we help?">
+                    </div>
+                    <div class="form-group contact-full">
+                        <label>Message</label>
+                        <textarea rows="5" placeholder="Write your message here..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit">Send Message →</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

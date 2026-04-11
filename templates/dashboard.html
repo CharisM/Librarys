@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #120820;
+            color: #ede9fe;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.12; }
+        .orb-1 { width: 400px; height: 400px; background: #7c3aed; top: -100px; left: -100px; }
+        .orb-2 { width: 300px; height: 300px; background: #a855f7; bottom: 0; right: -80px; }
+
+        nav {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 40px;
+            background: rgba(26, 13, 46, 0.95);
+            border-bottom: 1px solid #2a1245;
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-logo { font-size: 1.3rem; font-weight: 700; color: #ede9fe; }
+        .nav-logo span { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .nav-right { display: flex; align-items: center; gap: 14px; }
+
+        .nav-user {
+            display: flex; align-items: center; gap: 8px;
+            background: #2d1254; border: 1px solid #3d1f6b;
+            border-radius: 20px; padding: 6px 14px;
+            font-size: 0.85rem; color: #c4b5fd;
+        }
+
+        .logout-btn {
+            padding: 8px 18px;
+            background: transparent;
+            border: 1px solid #3d1f6b;
+            border-radius: 8px;
+            color: #a78bfa;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover { background: #2d1254; color: #ede9fe; }
+
+        main { flex: 1; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+
+        /* Welcome banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, #2d0a4e, #4a0e8f);
+            border: 1px solid #5b21b6;
+            border-radius: 18px;
+            padding: 32px 36px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-text h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+        .welcome-text h1 span { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .welcome-text p { color: #c4b5fd; font-size: 0.9rem; }
+        .welcome-emoji { font-size: 3.5rem; }
+
+        /* Stats */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 36px; }
+
+        .stat-card {
+            background: #1e0d35;
+            border: 1px solid #2d1254;
+            border-radius: 14px;
+            padding: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+        }
+
+        .stat-icon { font-size: 1.4rem; margin-bottom: 10px; }
+        .stat-label { font-size: 0.75rem; color: #7c6fa0; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #c4b5fd; }
+
+        /* Genre filters */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label { font-size: 0.8rem; color: #7c6fa0; font-weight: 500; margin-right: 4px; }
+
+        .genre-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid #3d1f6b;
+            background: transparent;
+            color: #a78bfa;
+            transition: all 0.2s;
+        }
+
+        .genre-btn:hover, .genre-btn.active {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        /* Section header */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title { font-size: 1.05rem; font-weight: 600; color: #ede9fe; }
+        .section-count { font-size: 0.8rem; color: #7c6fa0; background: #1e0d35; padding: 4px 12px; border-radius: 20px; border: 1px solid #2d1254; }
+
+        /* Books grid */
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+
+        .book-card {
+            background: #1e0d35;
+            border: 1px solid #2d1254;
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+
+        .book-card:hover {
+            border-color: #7c3aed;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(124,58,237,0.15);
+        }
+
+        .book-cover-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #3d1f6b;
+        }
+
+        .book-cover-placeholder {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #2d0a4e, #5b21b6);
+            border-radius: 10px;
+            border: 1px solid #3d1f6b;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem;
+        }
+
+        .book-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 8px; }
+
+        .book-genre-tag {
+            font-size: 0.72rem;
+            background: rgba(124,58,237,0.2);
+            color: #c4b5fd;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid #3d1f6b;
+        }
+
+        .book-title { font-size: 0.95rem; font-weight: 600; color: #ede9fe; line-height: 1.4; }
+
+        .book-status { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #a78bfa; }
+        .status-dot { width: 6px; height: 6px; background: #a855f7; border-radius: 50%; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .book-btn {
+            display: inline-block;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 3px 12px rgba(124,58,237,0.3);
+        }
+
+        .book-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7c6fa0;
+        }
+
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+        .empty-state p { font-size: 0.95rem; }
+
+        footer {
+            position: relative; z-index: 1;
+            background: #0e0618;
+            border-top: 1px solid #2a1245;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-logo { font-size: 1rem; font-weight: 700; color: #a78bfa; }
+        .footer-copy { font-size: 0.8rem; color: #4a3a6a; }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { font-size: 0.8rem; color: #6b5a8a; text-decoration: none; }
+        .footer-links a:hover { color: #a78bfa; }
+
+        @media (max-width: 768px) {
+            nav { padding: 16px 20px; }
+            main { padding: 24px 20px; }
+            .stats { grid-template-columns: 1fr; }
+            .welcome-banner { flex-direction: column; gap: 16px; text-align: center; }
+            footer { flex-direction: column; gap: 10px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <nav>
+        <div class="nav-logo">📚 Libra<span>Space</span></div>
+        <div class="nav-right">
+            <div class="nav-user">👤 {{ username }}</div>
+            <a href="/logout" class="logout-btn">Sign out</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h1>Welcome back, <span>{{ username }}</span> 👋</h1>
+                <p>Discover and reserve books from our collection below.</p>
+            </div>
+            <div class="welcome-emoji">📚</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-label">Total Books</div>
+                <div class="stat-value">{{ books | length }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-label">Available Now</div>
+                <div class="stat-value">{{ books | length }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏷️</div>
+                <div class="stat-label">Genres</div>
+                <div class="stat-value">{{ genres | length }}</div>
+            </div>
+        </div>
+
+        <!-- Genre Filter -->
+        <div class="filter-bar">
+            <span class="filter-label">Filter by genre:</span>
+            <a href="/dashboard" class="genre-btn {{ 'active' if not selected_genre }}">All</a>
+            {% for genre in genres %}
+            <a href="/dashboard?genre={{ genre }}" class="genre-btn {{ 'active' if selected_genre == genre }}">{{ genre }}</a>
+            {% endfor %}
+        </div>
+
+        <!-- Books -->
+        <div class="section-header">
+            <div class="section-title">{{ selected_genre if selected_genre else 'All Books' }}</div>
+            <div class="section-count">{{ books | length }} books</div>
+        </div>
+
+        {% if books %}
+        <div class="books-grid">
+            {% for book in books %}
+            <div class="book-card">
+                {% if book.cover_url %}
+                <img src="{{ book.cover_url }}" alt="{{ book.title }}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                <div class="book-cover-placeholder" style="display:none">📖</div>
+                {% else %}
+                <div class="book-cover-placeholder">📖</div>
+                {% endif %}
+                <div class="book-card-top">
+                    <div class="book-genre-tag">{{ book.genre if book.genre else 'General' }}</div>
+                </div>
+                <div class="book-title">{{ book.title }}</div>
+                <div class="book-status">
+                    <div class="status-dot"></div>
+                    Available for booking
+                </div>
+                <a href="/book/{{ book.id }}" class="book-btn">View Book</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <p>No books found in this genre.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <div class="footer-logo">📚 LibraSpace</div>
+        <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+        <div class="footer-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock %}
+
+{% block extra_styles %}
+.page-wrap { padding: 80px 60px; max-width: 1200px; margin: 0 auto; }
+
+.page-hero { text-align: center; margin-bottom: 70px; }
+.page-label { font-size: 0.78rem; font-weight: 600; color: var(--purple-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
+.page-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+.page-title .gradient { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.page-sub { font-size: 1rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+
+.about-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+
+.about-visual {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.about-book-row {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.about-book-row:hover { border-color: var(--purple); transform: translateX(4px); }
+.about-book-icon { font-size: 1.4rem; }
+.about-book-title { font-size: 0.9rem; font-weight: 500; color: var(--text); }
+.about-book-tag { margin-left: auto; font-size: 0.75rem; background: rgba(124,58,237,0.2); color: var(--accent); padding: 3px 10px; border-radius: 20px; }
+
+.about-content p { color: var(--text-muted); line-height: 1.8; margin-bottom: 16px; font-size: 0.95rem; }
+
+.about-list { list-style: none; margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+.about-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-muted); }
+.about-list li::before { content: '✦'; color: var(--purple-light); font-size: 0.7rem; }
+
+.team-section { margin-top: 80px; }
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 40px; }
+
+.team-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+}
+
+.team-card:hover { border-color: var(--purple); transform: translateY(-4px); }
+.team-avatar { width: 64px; height: 64px; background: linear-gradient(135deg, #5b21b6, #a855f7); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 14px; }
+.team-name { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.team-role { font-size: 0.8rem; color: var(--text-muted); }
+
+@media (max-width: 768px) {
+    .page-wrap { padding: 60px 24px; }
+    .about-wrap { grid-template-columns: 1fr; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+    <div class="page-hero">
+        <div class="page-label">About Us</div>
+        <h1 class="page-title">Built for book lovers,<br><span class="gradient">by book lovers</span></h1>
+        <p class="page-sub">LibraSpace was created to make library management simple, modern, and accessible to everyone.</p>
+    </div>
+
+    <div class="about-wrap">
+        <div class="about-visual">
+            <div class="about-book-row">
+                <div class="about-book-icon">📗</div>
+                <div class="about-book-title">Python Basics</div>
+                <div class="about-book-tag">Available</div>
+            </div>
+            <div class="about-book-row">
+                <div class="about-book-icon">📘</div>
+                <div class="about-book-title">Flask Guide</div>
+                <div class="about-book-tag">Available</div>
+            </div>
+            <div class="about-book-row">
+                <div class="about-book-icon">📙</div>
+                <div class="about-book-title">Database Systems</div>
+                <div class="about-book-tag">Available</div>
+            </div>
+            <div class="about-book-row">
+                <div class="about-book-icon">📕</div>
+                <div class="about-book-title">Web Development</div>
+                <div class="about-book-tag">Available</div>
+            </div>
+        </div>
+
+        <div class="about-content">
+            <p>LibraSpace is a student-built library booking system designed to modernize how people interact with their local library. We believe that access to knowledge should be simple, fast, and beautiful.</p>
+            <p>Our platform connects readers with books through a seamless digital experience — from registration to reservation, everything is just a few clicks away.</p>
+            <p>We are committed to making reading more accessible by providing a free, easy-to-use platform that works on any device, anywhere in the world.</p>
+            <ul class="about-list">
+                <li>Free to use for all registered members</li>
+                <li>Real-time book availability updates</li>
+                <li>Simple and intuitive booking process</li>
+                <li>Secure cloud-based data storage</li>
+                <li>Accessible from any device, anywhere</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="team-section">
+        <div class="page-label" style="text-align:center;">Our Team</div>
+        <h2 class="page-title" style="text-align:center; font-size:1.8rem;">The people behind LibraSpace</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">👨‍💻</div>
+                <div class="team-name">Developer</div>
+                <div class="team-role">Full Stack</div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">🎨</div>
+                <div class="team-name">Designer</div>
+                <div class="team-role">UI / UX</div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">🗄️</div>
+                <div class="team-name">Database</div>
+                <div class="team-role">Backend</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

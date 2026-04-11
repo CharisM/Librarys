@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — {{ book.title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #120820;
+            color: #ede9fe;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.12; }
+        .orb-1 { width: 400px; height: 400px; background: #7c3aed; top: -100px; left: -100px; }
+        .orb-2 { width: 300px; height: 300px; background: #a855f7; bottom: 0; right: -80px; }
+
+        nav {
+            position: relative; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 18px 40px;
+            background: rgba(26, 13, 46, 0.95);
+            border-bottom: 1px solid #2a1245;
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-logo { font-size: 1.3rem; font-weight: 700; color: #ede9fe; text-decoration: none; }
+        .nav-logo span { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .nav-right { display: flex; align-items: center; gap: 14px; }
+
+        .nav-user {
+            display: flex; align-items: center; gap: 8px;
+            background: #2d1254; border: 1px solid #3d1f6b;
+            border-radius: 20px; padding: 6px 14px;
+            font-size: 0.85rem; color: #c4b5fd;
+        }
+
+        .logout-btn {
+            padding: 8px 18px; background: transparent;
+            border: 1px solid #3d1f6b; border-radius: 8px;
+            color: #a78bfa; font-size: 0.85rem;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; transition: background 0.2s;
+        }
+
+        .logout-btn:hover { background: #2d1254; color: #ede9fe; }
+
+        main {
+            flex: 1; position: relative; z-index: 1;
+            padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%;
+        }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: #a78bfa; text-decoration: none; font-size: 0.875rem;
+            font-weight: 500; margin-bottom: 36px;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover { color: #ede9fe; }
+
+        .book-detail {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Book cover */
+        .book-cover {
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            aspect-ratio: 3/4;
+            position: relative;
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .book-cover-fallback {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #2d0a4e, #5b21b6);
+            border: 1px solid #3d1f6b;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .book-cover-icon { font-size: 5rem; }
+        .book-cover-title {
+            font-size: 0.9rem; font-weight: 600; color: #ede9fe;
+            text-align: center; padding: 0 20px; line-height: 1.4;
+        }
+
+        /* Book info */
+        .book-info { display: flex; flex-direction: column; gap: 24px; }
+
+        .book-genre-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(124,58,237,0.2);
+            border: 1px solid #5b21b6;
+            border-radius: 20px; padding: 6px 16px;
+            font-size: 0.82rem; color: #c4b5fd; font-weight: 500;
+            width: fit-content;
+        }
+
+        .book-title-large {
+            font-size: 2rem; font-weight: 800;
+            letter-spacing: -0.5px; line-height: 1.2;
+            color: #ede9fe;
+        }
+
+        .book-meta-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .meta-card {
+            background: #1e0d35; border: 1px solid #2d1254;
+            border-radius: 12px; padding: 16px;
+        }
+
+        .meta-label { font-size: 0.72rem; color: #7c6fa0; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+        .meta-value { font-size: 0.9rem; font-weight: 600; color: #ede9fe; }
+
+        .book-description {
+            background: #1e0d35; border: 1px solid #2d1254;
+            border-radius: 14px; padding: 22px;
+        }
+
+        .desc-label { font-size: 0.78rem; color: #7c6fa0; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
+        .desc-text { font-size: 0.9rem; color: #a78bfa; line-height: 1.7; }
+
+        .book-status-bar {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(124,58,237,0.1);
+            border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 12px; padding: 14px 18px;
+        }
+
+        .status-dot { width: 8px; height: 8px; background: #a855f7; border-radius: 50%; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+        }
+
+        .status-text { font-size: 0.875rem; color: #c4b5fd; font-weight: 500; }
+
+        .reserve-btn {
+            display: block; width: 100%; padding: 15px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border: none; border-radius: 12px;
+            color: #fff; font-size: 1rem; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; text-align: center;
+            transition: opacity 0.2s, transform 0.15s;
+            box-shadow: 0 6px 25px rgba(124,58,237,0.4);
+        }
+
+        .reserve-btn:hover { opacity: 0.88; transform: translateY(-2px); }
+
+        .back-to-dashboard {
+            display: block; width: 100%; padding: 13px;
+            background: transparent; border: 1px solid #3d1f6b;
+            border-radius: 12px; color: #a78bfa;
+            font-size: 0.9rem; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; text-align: center;
+            transition: background 0.2s;
+        }
+
+        .back-to-dashboard:hover { background: #1e0d35; }
+
+        footer {
+            position: relative; z-index: 1;
+            background: #0e0618; border-top: 1px solid #2a1245;
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .footer-logo { font-size: 1rem; font-weight: 700; color: #a78bfa; }
+        .footer-copy { font-size: 0.8rem; color: #4a3a6a; }
+
+        @media (max-width: 768px) {
+            main { padding: 30px 20px; }
+            .book-detail { grid-template-columns: 1fr; }
+            .book-cover { aspect-ratio: 16/9; }
+            footer { flex-direction: column; gap: 10px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <nav>
+        <a href="/dashboard" class="nav-logo">📚 Libra<span>Space</span></a>
+        <div class="nav-right">
+            <div class="nav-user">👤 {{ username }}</div>
+            <a href="/logout" class="logout-btn">Sign out</a>
+        </div>
+    </nav>
+
+    <main>
+        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+
+        <div class="book-detail">
+            <div class="book-cover">
+                {% if book.cover_url %}
+                <img src="{{ book.cover_url }}" alt="{{ book.title }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                {% endif %}
+                <div class="book-cover-fallback" {% if book.cover_url %}style="display:none"{% endif %}>
+                    <div class="book-cover-icon">
+                        {% if book.genre == 'Fantasy' %}🧙
+                        {% elif book.genre == 'Romance' %}💕
+                        {% elif book.genre == 'Love Story' %}❤️
+                        {% elif book.genre == 'Science Fiction' %}🚀
+                        {% elif book.genre == 'Adventure' %}🗺️
+                        {% elif book.genre == 'Classic' %}📜
+                        {% elif book.genre == 'Programming' %}💻
+                        {% elif book.genre == 'Database' %}🗄️
+                        {% else %}📖
+                        {% endif %}
+                    </div>
+                    <div class="book-cover-title">{{ book.title }}</div>
+                </div>
+            </div>
+
+            <div class="book-info">
+                <div class="book-genre-badge">
+                    🏷️ {{ book.genre if book.genre else 'General' }}
+                </div>
+
+                <div class="book-title-large">{{ book.title }}</div>
+
+                <div class="book-meta-grid">
+                    <div class="meta-card">
+                        <div class="meta-label">Genre</div>
+                        <div class="meta-value">{{ book.genre if book.genre else 'General' }}</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Status</div>
+                        <div class="meta-value" style="color:#a855f7;">Available</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Book ID</div>
+                        <div class="meta-value">#{{ book.id }}</div>
+                    </div>
+                    <div class="meta-card">
+                        <div class="meta-label">Format</div>
+                        <div class="meta-value">Physical Copy</div>
+                    </div>
+                </div>
+
+                <div class="book-description">
+                    <div class="desc-label">About this book</div>
+                    <div class="desc-text">
+                        {% if book.genre == 'Fantasy' %}
+                            A captivating fantasy adventure filled with magic, mythical creatures, and epic quests that will transport you to another world.
+                        {% elif book.genre == 'Romance' %}
+                            A heartwarming romance story that explores the beauty of love, relationships, and the journey of two souls finding each other.
+                        {% elif book.genre == 'Love Story' %}
+                            A touching and emotional love story that will make you laugh, cry, and believe in the power of true love.
+                        {% elif book.genre == 'Science Fiction' %}
+                            A thrilling science fiction tale set in a futuristic world, exploring technology, humanity, and the unknown.
+                        {% elif book.genre == 'Adventure' %}
+                            An exciting adventure story packed with action, discovery, and the courage to face the unknown.
+                        {% elif book.genre == 'Classic' %}
+                            A timeless classic that has stood the test of time, offering deep insights into the human condition and society.
+                        {% elif book.genre == 'Programming' %}
+                            A comprehensive guide to programming concepts, helping you build strong foundations in software development.
+                        {% elif book.genre == 'Database' %}
+                            An in-depth exploration of database systems, covering design, management, and optimization techniques.
+                        {% else %}
+                            An engaging book available for reservation at LibraSpace. Reserve your copy today!
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="book-status-bar">
+                    <div class="status-dot"></div>
+                    <div class="status-text">This book is available for reservation</div>
+                </div>
+
+                <a href="/reserve/{{ book.id }}" class="reserve-btn">Reserve This Book →</a>
+                <a href="/dashboard" class="back-to-dashboard">← Back to Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-logo">📚 LibraSpace</div>
+        <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+    </footer>
+
+</body>
+</html>
