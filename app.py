@@ -1,14 +1,15 @@
-from flask import Flask, render_template, request, redirect, session, make_response
-from itsdangerous import URLSafeSerializer
+from flask import Flask, render_template, request, redirect, session
 import requests
 import os
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.secret_key = os.getenv("SECRET_KEY", "libraspace2025")
-app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SECURE'] = os.getenv("VERCEL") == "1"
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 
@@ -21,8 +22,12 @@ HEADERS = {
 }
 
 def db_get(table, params=None):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("db_get error: missing SUPABASE_URL or SUPABASE_KEY")
+        return []
     try:
         r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}", headers=HEADERS, params=params)
+        r.raise_for_status()
         data = r.json()
         return data if isinstance(data, list) else []
     except Exception as e:
@@ -30,12 +35,18 @@ def db_get(table, params=None):
         return []
 
 def db_post(table, data):
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("db_post error: missing SUPABASE_URL or SUPABASE_KEY")
+        return []
     try:
         h = {**HEADERS, "Prefer": "return=representation"}
         r = requests.post(f"{SUPABASE_URL}/rest/v1/{table}", headers=h, json=data)
+        r.raise_for_status()
         print(r.status_code, r.text)
+        return r.json() if r.text else []
     except Exception as e:
         print("db_post error:", e)
+        return []
 
 @app.route('/')
 def home():
@@ -66,6 +77,8 @@ def login():
         try:
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '').strip()
+            if not SUPABASE_URL or not SUPABASE_KEY:
+                return render_template('login.html', error='Server configuration error: missing database environment variables')
             users = db_get('users', {'username': f'eq.{username}', 'password': f'eq.{password}'})
             print("Login result:", users)
             if users and len(users) > 0:
