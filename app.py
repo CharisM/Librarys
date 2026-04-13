@@ -3,8 +3,12 @@ import requests
 import os
 from dotenv import load_dotenv
 from werkzeug.middleware.proxy_fix import ProxyFix
-import psycopg
-from psycopg.rows import dict_row
+try:
+    import psycopg
+    from psycopg.rows import dict_row
+except ImportError:
+    psycopg = None
+    dict_row = None
 
 load_dotenv()
 
@@ -26,7 +30,7 @@ HEADERS = {
 
 
 def get_db_connection():
-    if not DATABASE_URL:
+    if not DATABASE_URL or psycopg is None:
         return None
     return psycopg.connect(DATABASE_URL, row_factory=dict_row)
 
@@ -64,7 +68,7 @@ def db_post(table, data):
 
 
 def get_user_by_credentials(username, password):
-    if DATABASE_URL:
+    if DATABASE_URL and psycopg is not None:
         try:
             with get_db_connection() as conn, conn.cursor() as cur:
                 cur.execute(
@@ -80,7 +84,7 @@ def get_user_by_credentials(username, password):
 
 
 def get_user_by_id(user_id):
-    if DATABASE_URL:
+    if DATABASE_URL and psycopg is not None:
         try:
             with get_db_connection() as conn, conn.cursor() as cur:
                 cur.execute("SELECT id, username FROM users WHERE id = %s LIMIT 1", (user_id,))
@@ -93,7 +97,7 @@ def get_user_by_id(user_id):
 
 
 def create_user(username, password):
-    if DATABASE_URL:
+    if DATABASE_URL and psycopg is not None:
         try:
             with get_db_connection() as conn, conn.cursor() as cur:
                 cur.execute(
@@ -111,7 +115,7 @@ def create_user(username, password):
 
 
 def get_books(genre_filter=None):
-    if DATABASE_URL:
+    if DATABASE_URL and psycopg is not None:
         try:
             with get_db_connection() as conn, conn.cursor() as cur:
                 if genre_filter:
@@ -127,7 +131,7 @@ def get_books(genre_filter=None):
 
 
 def get_book_by_id(book_id):
-    if DATABASE_URL:
+    if DATABASE_URL and psycopg is not None:
         try:
             with get_db_connection() as conn, conn.cursor() as cur:
                 cur.execute("SELECT * FROM books WHERE id = %s LIMIT 1", (book_id,))
@@ -140,7 +144,7 @@ def get_book_by_id(book_id):
 
 
 def create_booking(user_id, book_id):
-    if DATABASE_URL:
+    if DATABASE_URL and psycopg is not None:
         try:
             with get_db_connection() as conn, conn.cursor() as cur:
                 cur.execute(
@@ -192,7 +196,7 @@ def login():
             password = request.form.get('password', '').strip()
             if not username or not password:
                 return render_template('login.html', error='Username and password are required.')
-            if not DATABASE_URL and not has_rest_config():
+            if not (DATABASE_URL and psycopg is not None) and not has_rest_config():
                 return render_template('login.html', error='Server configuration error: missing database environment variables')
             user = get_user_by_credentials(username, password)
             print("Login result:", user)
