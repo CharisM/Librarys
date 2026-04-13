@@ -3,4 +3,3 @@ requests
 python-dotenv
 itsdangerous
 gunicorn
-psycopg[binary]
