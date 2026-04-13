@@ -30,14 +30,17 @@ def get_db_connection():
         return None
     return psycopg.connect(DATABASE_URL, row_factory=dict_row)
 
+
+def has_rest_config():
+    return bool(SUPABASE_URL and SUPABASE_KEY)
+
+
 def db_get(table, params=None):
-    if DATABASE_URL:
-        return []
-    if not SUPABASE_URL or not SUPABASE_KEY:
+    if not has_rest_config():
         print("db_get error: missing SUPABASE_URL or SUPABASE_KEY")
         return []
     try:
-        r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}", headers=HEADERS, params=params)
+        r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}", headers=HEADERS, params=params, timeout=15)
         r.raise_for_status()
         data = r.json()
         return data if isinstance(data, list) else []
@@ -46,14 +49,12 @@ def db_get(table, params=None):
         return []
 
 def db_post(table, data):
-    if DATABASE_URL:
-        return []
-    if not SUPABASE_URL or not SUPABASE_KEY:
+    if not has_rest_config():
         print("db_post error: missing SUPABASE_URL or SUPABASE_KEY")
         return []
     try:
         h = {**HEADERS, "Prefer": "return=representation"}
-        r = requests.post(f"{SUPABASE_URL}/rest/v1/{table}", headers=h, json=data)
+        r = requests.post(f"{SUPABASE_URL}/rest/v1/{table}", headers=h, json=data, timeout=15)
         r.raise_for_status()
         print(r.status_code, r.text)
         return r.json() if r.text else []
@@ -73,7 +74,6 @@ def get_user_by_credentials(username, password):
                 return cur.fetchone()
         except Exception as e:
             print("get_user_by_credentials error:", e)
-            return None
 
     users = db_get('users', {'username': f'eq.{username}', 'password': f'eq.{password}'})
     return users[0] if users else None
@@ -87,7 +87,6 @@ def get_user_by_id(user_id):
                 return cur.fetchone()
         except Exception as e:
             print("get_user_by_id error:", e)
-            return None
 
     users = db_get('users', {'id': f"eq.{user_id}"})
     return users[0] if users else None
@@ -106,7 +105,6 @@ def create_user(username, password):
                 return user
         except Exception as e:
             print("create_user error:", e)
-            return None
 
     created = db_post('users', {'username': username, 'password': password})
     return created[0] if created else None
@@ -123,7 +121,6 @@ def get_books(genre_filter=None):
                 return cur.fetchall()
         except Exception as e:
             print("get_books error:", e)
-            return []
 
     params = {'genre': f'eq.{genre_filter}'} if genre_filter else None
     return db_get('books', params)
@@ -137,7 +134,6 @@ def get_book_by_id(book_id):
                 return cur.fetchone()
         except Exception as e:
             print("get_book_by_id error:", e)
-            return None
 
     books = db_get('books', {'id': f'eq.{book_id}'})
     return books[0] if books else None
@@ -156,7 +152,6 @@ def create_booking(user_id, book_id):
                 return booking
         except Exception as e:
             print("create_booking error:", e)
-            return None
 
     created = db_post('bookings', {'user_id': user_id, 'book_id': book_id})
     return created[0] if created else None
@@ -180,10 +175,12 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '').strip()
+        if not username or not password:
+            return render_template('register.html', error='Username and password are required.')
         print("Registering:", username)
         created_user = create_user(username, password)
         if not created_user:
-            return render_template('register.html', error='Unable to create account right now. Please try again.')
+            return render_template('register.html', error='Unable to create account right now. Check your database config or table permissions.')
         return redirect('/login')
     return render_template('register.html')
 
@@ -193,7 +190,9 @@ def login():
         try:
             username = request.form.get('username', '').strip()
             password = request.form.get('password', '').strip()
-            if not DATABASE_URL and (not SUPABASE_URL or not SUPABASE_KEY):
+            if not username or not password:
+                return render_template('login.html', error='Username and password are required.')
+            if not DATABASE_URL and not has_rest_config():
                 return render_template('login.html', error='Server configuration error: missing database environment variables')
             user = get_user_by_credentials(username, password)
             print("Login result:", user)
