@@ -4,48 +4,121 @@
 {% block extra_styles %}
 .page-wrap { padding: 80px 60px; max-width: 1200px; margin: 0 auto; }
 
-.page-hero { text-align: center; margin-bottom: 70px; }
-.page-label { font-size: 0.78rem; font-weight: 600; color: var(--purple-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
-.page-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
-.page-title .gradient { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.page-sub { font-size: 1rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+.page-hero { text-align: center; margin-bottom: 72px; }
 
-.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.page-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 100px; padding: 5px 16px;
+    font-size: 0.72rem; color: var(--gold); font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
+}
+
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700; letter-spacing: -0.5px;
+    margin-bottom: 18px; color: var(--text); line-height: 1.2;
+}
+
+.page-title .highlight { color: var(--gold); }
+
+.page-sub {
+    font-size: 1rem; color: var(--text-muted);
+    max-width: 480px; margin: 0 auto; line-height: 1.8;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
 
 .feature-card {
-    background: var(--surface2);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 32px;
+    border-radius: 12px; padding: 32px;
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+}
+
+.feature-card::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%);
 }
 
 .feature-card:hover {
-    border-color: var(--purple);
+    border-color: var(--gold);
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(124,58,237,0.15);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.3);
 }
 
 .feature-icon {
-    width: 56px; height: 56px;
-    background: linear-gradient(135deg, #3b0764, #5b21b6);
-    border-radius: 14px;
+    width: 52px; height: 52px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem;
-    margin-bottom: 20px;
+    font-size: 1.4rem; margin-bottom: 20px;
 }
 
-.feature-title { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 10px; }
-.feature-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; }
+.feature-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+.feature-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.75; }
 
-@media (max-width: 768px) { .page-wrap { padding: 60px 24px; } }
+.cta-section {
+    margin-top: 80px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 56px;
+    text-align: center;
+    position: relative; overflow: hidden;
+}
+
+.cta-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.04) 0%, transparent 60%);
+}
+
+.cta-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700;
+    color: var(--text); margin-bottom: 14px;
+    position: relative; z-index: 1;
+}
+
+.cta-section h2 span { color: var(--gold); }
+
+.cta-section p {
+    font-size: 0.95rem; color: var(--text-muted);
+    margin-bottom: 32px; position: relative; z-index: 1;
+}
+
+.cta-btn {
+    display: inline-block; padding: 13px 36px;
+    background: var(--gold); border-radius: 6px;
+    color: #0a1628; font-size: 0.95rem; font-weight: 700;
+    text-decoration: none; transition: all 0.2s;
+    position: relative; z-index: 1;
+}
+
+.cta-btn:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+
+@media (max-width: 768px) {
+    .page-wrap { padding: 60px 24px; }
+    .cta-section { padding: 36px 24px; }
+}
 {% endblock %}
 
 {% block content %}
 <div class="page-wrap">
     <div class="page-hero">
-        <div class="page-label">Why LibraSpace</div>
-        <h1 class="page-title">Everything you need to<br><span class="gradient">manage your reading</span></h1>
+        <div class="page-eyebrow">Why LibraSpace</div>
+        <h1 class="page-title">Everything you need to<br><span class="highlight">manage your reading</span></h1>
         <p class="page-sub">A seamless experience from browsing to booking — built for modern readers.</p>
     </div>
 
@@ -53,33 +126,39 @@
         <div class="feature-card">
             <div class="feature-icon">📖</div>
             <div class="feature-title">Easy Book Browsing</div>
-            <div class="feature-desc">Browse our full collection of books with a clean, intuitive interface designed for speed and simplicity.</div>
+            <div class="feature-desc">Browse our full collection with a clean, intuitive interface designed for speed and simplicity. Filter by genre or search by title.</div>
         </div>
         <div class="feature-card">
             <div class="feature-icon">🔖</div>
             <div class="feature-title">Instant Reservations</div>
-            <div class="feature-desc">Reserve any book in one click. Your booking is confirmed instantly — no waiting, no paperwork.</div>
+            <div class="feature-desc">Reserve any book in one click. Your booking is confirmed instantly — no waiting, no paperwork, no hassle.</div>
         </div>
         <div class="feature-card">
             <div class="feature-icon">🔐</div>
             <div class="feature-title">Secure Accounts</div>
-            <div class="feature-desc">Your account and reading history are protected with secure authentication and private sessions.</div>
+            <div class="feature-desc">Your account and reading history are protected with secure password hashing and private session management.</div>
         </div>
         <div class="feature-card">
             <div class="feature-icon">📱</div>
             <div class="feature-title">Mobile Friendly</div>
-            <div class="feature-desc">Access LibraSpace from any device — desktop, tablet, or phone. Fully responsive design.</div>
+            <div class="feature-desc">Access LibraSpace from any device — desktop, tablet, or phone. Fully responsive design that works everywhere.</div>
         </div>
         <div class="feature-card">
             <div class="feature-icon">⚡</div>
             <div class="feature-title">Fast & Reliable</div>
-            <div class="feature-desc">Powered by a cloud database for lightning-fast performance and 99.9% uptime availability.</div>
+            <div class="feature-desc">Powered by Supabase cloud database for lightning-fast performance and high availability around the clock.</div>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🌙</div>
-            <div class="feature-title">Dark Mode Design</div>
-            <div class="feature-desc">A beautiful dark purple interface that's easy on the eyes — perfect for late-night reading sessions.</div>
+            <div class="feature-icon">📋</div>
+            <div class="feature-title">Reservation Management</div>
+            <div class="feature-desc">View all your reserved books in one place and cancel any reservation instantly with a single click.</div>
         </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>Ready to start <span>reading?</span></h2>
+        <p>Join LibraSpace today and get instant access to our entire book collection — completely free.</p>
+        <a href="/register" class="cta-btn">Get Started Free →</a>
     </div>
 </div>
 {% endblock %}

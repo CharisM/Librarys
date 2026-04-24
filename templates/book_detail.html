@@ -4,203 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LibraSpace — {{ book.title }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #120820;
-            color: #ede9fe;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        :root {
+            --bg: #0a1628;
+            --surface: #0d1b35;
+            --surface2: #111f3e;
+            --border: #1a2d52;
+            --border2: #1f3660;
+            --gold: #c9a84c;
+            --gold-light: #e8c96a;
+            --text: #e8edf5;
+            --text-muted: #6b7a99;
+            --text-soft: #9aa3bc;
         }
 
-        .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-        .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.12; }
-        .orb-1 { width: 400px; height: 400px; background: #7c3aed; top: -100px; left: -100px; }
-        .orb-2 { width: 300px; height: 300px; background: #a855f7; bottom: 0; right: -80px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        .grid-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
 
         nav {
             position: relative; z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 18px 40px;
-            background: rgba(26, 13, 46, 0.95);
-            border-bottom: 1px solid #2a1245;
+            padding: 0 40px; height: 64px;
+            background: rgba(10,22,40,0.95);
+            border-bottom: 1px solid var(--border);
             backdrop-filter: blur(20px);
         }
 
-        .nav-logo { font-size: 1.3rem; font-weight: 700; color: #ede9fe; text-decoration: none; }
-        .nav-logo span { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem; font-weight: 700;
+            color: var(--text); text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
+        }
 
-        .nav-right { display: flex; align-items: center; gap: 14px; }
+        .nav-logo-icon {
+            width: 28px; height: 28px; background: var(--gold);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        }
+
+        .nav-logo span { color: var(--gold); }
+
+        .nav-right { display: flex; align-items: center; gap: 10px; }
 
         .nav-user {
             display: flex; align-items: center; gap: 8px;
-            background: #2d1254; border: 1px solid #3d1f6b;
-            border-radius: 20px; padding: 6px 14px;
-            font-size: 0.85rem; color: #c4b5fd;
+            background: var(--surface2); border: 1px solid var(--border2);
+            border-radius: 6px; padding: 6px 14px;
+            font-size: 0.82rem; color: var(--text-soft);
         }
 
-        .logout-btn {
-            padding: 8px 18px; background: transparent;
-            border: 1px solid #3d1f6b; border-radius: 8px;
-            color: #a78bfa; font-size: 0.85rem;
+        .nav-btn {
+            padding: 7px 16px; background: transparent;
+            border: 1px solid var(--border2); border-radius: 6px;
+            color: var(--text-soft); font-size: 0.82rem;
             font-family: 'Inter', sans-serif; cursor: pointer;
-            text-decoration: none; transition: background 0.2s;
+            text-decoration: none; transition: all 0.2s;
         }
 
-        .logout-btn:hover { background: #2d1254; color: #ede9fe; }
+        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
 
         main {
             flex: 1; position: relative; z-index: 1;
-            padding: 50px 40px; max-width: 900px; margin: 0 auto; width: 100%;
+            padding: 48px 40px; max-width: 1000px; margin: 0 auto; width: 100%;
         }
 
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            color: #a78bfa; text-decoration: none; font-size: 0.875rem;
-            font-weight: 500; margin-bottom: 36px;
-            transition: color 0.2s;
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500;
+            margin-bottom: 36px; transition: color 0.2s;
         }
 
-        .back-btn:hover { color: #ede9fe; }
+        .back-link:hover { color: var(--gold); }
 
-        .book-detail {
+        .book-layout {
             display: grid;
             grid-template-columns: 280px 1fr;
-            gap: 40px;
+            gap: 48px;
             align-items: start;
         }
 
-        /* Book cover */
         .book-cover {
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            aspect-ratio: 3/4;
-            position: relative;
+            border-radius: 12px; overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+            aspect-ratio: 3/4; position: relative;
+            border: 1px solid var(--border);
         }
 
         .book-cover img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
         }
 
         .book-cover-fallback {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(145deg, #2d0a4e, #5b21b6);
-            border: 1px solid #3d1f6b;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
+            width: 100%; height: 100%;
+            background: var(--surface2);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 16px;
         }
 
-        .book-cover-icon { font-size: 5rem; }
-        .book-cover-title {
-            font-size: 0.9rem; font-weight: 600; color: #ede9fe;
-            text-align: center; padding: 0 20px; line-height: 1.4;
-        }
+        .fallback-icon { font-size: 4rem; }
+        .fallback-title { font-size: 0.85rem; font-weight: 600; color: var(--text-soft); text-align: center; padding: 0 20px; }
 
-        /* Book info */
         .book-info { display: flex; flex-direction: column; gap: 24px; }
 
-        .book-genre-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(124,58,237,0.2);
-            border: 1px solid #5b21b6;
-            border-radius: 20px; padding: 6px 16px;
-            font-size: 0.82rem; color: #c4b5fd; font-weight: 500;
+        .book-genre-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(201,168,76,0.1);
+            border: 1px solid rgba(201,168,76,0.25);
+            border-radius: 100px; padding: 5px 14px;
+            font-size: 0.75rem; color: var(--gold); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.6px;
             width: fit-content;
         }
 
-        .book-title-large {
-            font-size: 2rem; font-weight: 800;
-            letter-spacing: -0.5px; line-height: 1.2;
-            color: #ede9fe;
+        .book-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem; font-weight: 700;
+            line-height: 1.2; color: var(--text);
         }
 
-        .book-meta-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
+        .book-author-line { font-size: 0.95rem; color: var(--text-muted); }
+
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         .meta-card {
-            background: #1e0d35; border: 1px solid #2d1254;
-            border-radius: 12px; padding: 16px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 14px 16px;
         }
 
-        .meta-label { font-size: 0.72rem; color: #7c6fa0; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
-        .meta-value { font-size: 0.9rem; font-weight: 600; color: #ede9fe; }
+        .meta-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; }
+        .meta-value { font-size: 0.875rem; font-weight: 600; color: var(--text); }
 
-        .book-description {
-            background: #1e0d35; border: 1px solid #2d1254;
-            border-radius: 14px; padding: 22px;
+        .book-desc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px;
         }
 
-        .desc-label { font-size: 0.78rem; color: #7c6fa0; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
-        .desc-text { font-size: 0.9rem; color: #a78bfa; line-height: 1.7; }
+        .desc-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+        .desc-text { font-size: 0.875rem; color: var(--text-soft); line-height: 1.8; }
 
-        .book-status-bar {
+        .avail-bar {
             display: flex; align-items: center; gap: 10px;
-            background: rgba(124,58,237,0.1);
-            border: 1px solid rgba(124,58,237,0.3);
-            border-radius: 12px; padding: 14px 18px;
+            background: rgba(74,222,128,0.06);
+            border: 1px solid rgba(74,222,128,0.15);
+            border-radius: 8px; padding: 12px 16px;
         }
 
-        .status-dot { width: 8px; height: 8px; background: #a855f7; border-radius: 50%; animation: pulse 2s infinite; }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.3); }
-        }
-
-        .status-text { font-size: 0.875rem; color: #c4b5fd; font-weight: 500; }
+        .avail-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; }
+        .avail-text { font-size: 0.85rem; color: var(--text-soft); }
 
         .reserve-btn {
-            display: block; width: 100%; padding: 15px;
-            background: linear-gradient(135deg, #7c3aed, #a855f7);
-            border: none; border-radius: 12px;
-            color: #fff; font-size: 1rem; font-weight: 600;
+            display: block; width: 100%; padding: 14px;
+            background: var(--gold); border: none; border-radius: 8px;
+            color: #0a1628; font-size: 0.95rem; font-weight: 700;
             font-family: 'Inter', sans-serif; cursor: pointer;
             text-decoration: none; text-align: center;
-            transition: opacity 0.2s, transform 0.15s;
-            box-shadow: 0 6px 25px rgba(124,58,237,0.4);
+            transition: all 0.2s; letter-spacing: 0.3px;
         }
 
-        .reserve-btn:hover { opacity: 0.88; transform: translateY(-2px); }
+        .reserve-btn:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
 
-        .back-to-dashboard {
-            display: block; width: 100%; padding: 13px;
-            background: transparent; border: 1px solid #3d1f6b;
-            border-radius: 12px; color: #a78bfa;
-            font-size: 0.9rem; font-weight: 600;
+        .back-btn {
+            display: block; width: 100%; padding: 12px;
+            background: transparent; border: 1px solid var(--border2);
+            border-radius: 8px; color: var(--text-soft);
+            font-size: 0.875rem; font-weight: 500;
             font-family: 'Inter', sans-serif; cursor: pointer;
-            text-decoration: none; text-align: center;
-            transition: background 0.2s;
+            text-decoration: none; text-align: center; transition: all 0.2s;
         }
 
-        .back-to-dashboard:hover { background: #1e0d35; }
+        .back-btn:hover { border-color: var(--gold); color: var(--gold); }
 
         footer {
-            position: relative; z-index: 1;
-            background: #0e0618; border-top: 1px solid #2a1245;
+            position: relative; z-index: 1; margin-top: 40px;
+            background: var(--surface); border-top: 1px solid var(--border);
             padding: 20px 40px;
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        .footer-logo { font-size: 1rem; font-weight: 700; color: #a78bfa; }
-        .footer-copy { font-size: 0.8rem; color: #4a3a6a; }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--gold); }
+        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
 
         @media (max-width: 768px) {
             main { padding: 30px 20px; }
-            .book-detail { grid-template-columns: 1fr; }
+            .book-layout { grid-template-columns: 1fr; }
             .book-cover { aspect-ratio: 16/9; }
             footer { flex-direction: column; gap: 10px; text-align: center; }
         }
@@ -208,29 +213,30 @@
 </head>
 <body>
 
-    <div class="bg-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-    </div>
+    <div class="grid-bg"></div>
 
     <nav>
-        <a href="/dashboard" class="nav-logo">📚 Libra<span>Space</span></a>
+        <a href="/dashboard" class="nav-logo">
+            <div class="nav-logo-icon">📚</div>
+            Libra<span>Space</span>
+        </a>
         <div class="nav-right">
             <div class="nav-user">👤 {{ username }}</div>
-            <a href="/logout" class="logout-btn">Sign out</a>
+            <a href="/logout" class="nav-btn">Sign out</a>
         </div>
     </nav>
 
     <main>
-        <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
+        <a href="/dashboard" class="back-link">← Back to Dashboard</a>
 
-        <div class="book-detail">
+        <div class="book-layout">
             <div class="book-cover">
-                {% if book.cover_url %}
-                <img src="{{ book.cover_url }}" alt="{{ book.title }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                {% set book_image = book.image_url or book.cover_url %}
+                {% if book_image %}
+                <img src="{{ book_image }}" alt="{{ book.title }}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                 {% endif %}
-                <div class="book-cover-fallback" {% if book.cover_url %}style="display:none"{% endif %}>
-                    <div class="book-cover-icon">
+                <div class="book-cover-fallback" {% if book_image %}style="display:none"{% endif %}>
+                    <div class="fallback-icon">
                         {% if book.genre == 'Fantasy' %}🧙
                         {% elif book.genre == 'Romance' %}💕
                         {% elif book.genre == 'Love Story' %}❤️
@@ -242,25 +248,23 @@
                         {% else %}📖
                         {% endif %}
                     </div>
-                    <div class="book-cover-title">{{ book.title }}</div>
+                    <div class="fallback-title">{{ book.title }}</div>
                 </div>
             </div>
 
             <div class="book-info">
-                <div class="book-genre-badge">
-                    🏷️ {{ book.genre if book.genre else 'General' }}
-                </div>
+                <div class="book-genre-tag">{{ book.genre if book.genre else 'General' }}</div>
+                <div class="book-title">{{ book.title }}</div>
+                {% if book.author %}<div class="book-author-line">by {{ book.author }}</div>{% endif %}
 
-                <div class="book-title-large">{{ book.title }}</div>
-
-                <div class="book-meta-grid">
+                <div class="meta-grid">
+                    <div class="meta-card">
+                        <div class="meta-label">Author</div>
+                        <div class="meta-value">{{ book.author if book.author else 'Unknown' }}</div>
+                    </div>
                     <div class="meta-card">
                         <div class="meta-label">Genre</div>
                         <div class="meta-value">{{ book.genre if book.genre else 'General' }}</div>
-                    </div>
-                    <div class="meta-card">
-                        <div class="meta-label">Status</div>
-                        <div class="meta-value" style="color:#a855f7;">Available</div>
                     </div>
                     <div class="meta-card">
                         <div class="meta-label">Book ID</div>
@@ -272,38 +276,29 @@
                     </div>
                 </div>
 
-                <div class="book-description">
+                <div class="book-desc">
                     <div class="desc-label">About this book</div>
                     <div class="desc-text">
-                        {% if book.genre == 'Fantasy' %}
-                            A captivating fantasy adventure filled with magic, mythical creatures, and epic quests that will transport you to another world.
-                        {% elif book.genre == 'Romance' %}
-                            A heartwarming romance story that explores the beauty of love, relationships, and the journey of two souls finding each other.
-                        {% elif book.genre == 'Love Story' %}
-                            A touching and emotional love story that will make you laugh, cry, and believe in the power of true love.
-                        {% elif book.genre == 'Science Fiction' %}
-                            A thrilling science fiction tale set in a futuristic world, exploring technology, humanity, and the unknown.
-                        {% elif book.genre == 'Adventure' %}
-                            An exciting adventure story packed with action, discovery, and the courage to face the unknown.
-                        {% elif book.genre == 'Classic' %}
-                            A timeless classic that has stood the test of time, offering deep insights into the human condition and society.
-                        {% elif book.genre == 'Programming' %}
-                            A comprehensive guide to programming concepts, helping you build strong foundations in software development.
-                        {% elif book.genre == 'Database' %}
-                            An in-depth exploration of database systems, covering design, management, and optimization techniques.
-                        {% else %}
-                            An engaging book available for reservation at LibraSpace. Reserve your copy today!
+                        {% if book.genre == 'Fantasy' %}A captivating fantasy adventure filled with magic, mythical creatures, and epic quests.
+                        {% elif book.genre == 'Romance' %}A heartwarming romance story exploring the beauty of love and relationships.
+                        {% elif book.genre == 'Love Story' %}A touching and emotional love story that will make you laugh, cry, and believe in true love.
+                        {% elif book.genre == 'Science Fiction' %}A thrilling sci-fi tale set in a futuristic world, exploring technology and humanity.
+                        {% elif book.genre == 'Adventure' %}An exciting adventure packed with action, discovery, and the courage to face the unknown.
+                        {% elif book.genre == 'Classic' %}A timeless classic offering deep insights into the human condition and society.
+                        {% elif book.genre == 'Programming' %}A comprehensive guide to programming concepts and software development.
+                        {% elif book.genre == 'Database' %}An in-depth exploration of database systems, design, and optimization.
+                        {% else %}An engaging book available for reservation at LibraSpace. Reserve your copy today!
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="book-status-bar">
-                    <div class="status-dot"></div>
-                    <div class="status-text">This book is available for reservation</div>
+                <div class="avail-bar">
+                    <div class="avail-dot"></div>
+                    <div class="avail-text">This book is available for reservation</div>
                 </div>
 
                 <a href="/reserve/{{ book.id }}" class="reserve-btn">Reserve This Book →</a>
-                <a href="/dashboard" class="back-to-dashboard">← Back to Dashboard</a>
+                <a href="/dashboard" class="back-btn">← Back to Dashboard</a>
             </div>
         </div>
     </main>
@@ -311,6 +306,11 @@
     <footer>
         <div class="footer-logo">📚 LibraSpace</div>
         <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+        <div class="footer-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="/about">About</a>
+        </div>
     </footer>
 
 </body>

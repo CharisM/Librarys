@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — My Reservations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a1628;
+            --surface: #0d1b35;
+            --surface2: #111f3e;
+            --border: #1a2d52;
+            --border2: #1f3660;
+            --gold: #c9a84c;
+            --gold-light: #e8c96a;
+            --text: #e8edf5;
+            --text-muted: #6b7a99;
+            --text-soft: #9aa3bc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        .grid-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        nav {
+            position: relative; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; height: 64px;
+            background: rgba(10,22,40,0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem; font-weight: 700;
+            color: var(--text); text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .nav-logo-icon {
+            width: 28px; height: 28px; background: var(--gold);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        }
+
+        .nav-logo span { color: var(--gold); }
+
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+
+        .nav-user {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface2); border: 1px solid var(--border2);
+            border-radius: 6px; padding: 6px 14px;
+            font-size: 0.82rem; color: var(--text-soft);
+        }
+
+        .nav-btn {
+            padding: 7px 16px; background: transparent;
+            border: 1px solid var(--border2); border-radius: 6px;
+            color: var(--text-soft); font-size: 0.82rem;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; transition: all 0.2s;
+        }
+
+        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        main { flex: 1; padding: 36px 40px; max-width: 1280px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+
+        .page-header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text); }
+        .page-title span { color: var(--gold); }
+        .page-sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; }
+
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+
+        .book-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+
+        .book-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        .book-cover-wrap { position: relative; width: 100%; height: 200px; overflow: hidden; }
+
+        .book-cover-img {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+            transition: transform 0.3s;
+        }
+
+        .book-card:hover .book-cover-img { transform: scale(1.04); }
+
+        .book-cover-placeholder {
+            width: 100%; height: 100%;
+            background: var(--surface2);
+            display: flex; align-items: center; justify-content: center; font-size: 3rem;
+        }
+
+        .book-genre-badge {
+            position: absolute; top: 10px; left: 10px;
+            font-size: 0.68rem; font-weight: 600;
+            background: rgba(10,22,40,0.85);
+            border: 1px solid rgba(201,168,76,0.3);
+            color: var(--gold); padding: 3px 10px;
+            border-radius: 100px; backdrop-filter: blur(8px);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .reserved-badge {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 0.65rem; font-weight: 700;
+            background: rgba(74,222,128,0.15);
+            border: 1px solid rgba(74,222,128,0.3);
+            color: #4ade80; padding: 3px 10px;
+            border-radius: 100px; backdrop-filter: blur(8px);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .book-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .book-title { font-size: 0.9rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+        .book-author { font-size: 0.78rem; color: var(--text-muted); }
+
+        .book-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            display: flex; gap: 8px;
+        }
+
+        .view-btn {
+            flex: 1; padding: 8px 12px; background: var(--gold);
+            border-radius: 6px; color: #0a1628;
+            font-size: 0.78rem; font-weight: 700;
+            text-decoration: none; text-align: center; transition: all 0.2s;
+        }
+
+        .view-btn:hover { background: var(--gold-light); }
+
+        .cancel-btn {
+            flex: 1; padding: 8px 12px;
+            background: transparent;
+            border: 1px solid rgba(239,68,68,0.3); border-radius: 6px;
+            color: #f87171; font-size: 0.78rem; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; text-align: center; transition: all 0.2s;
+        }
+
+        .cancel-btn:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.5); }
+
+        .empty-state { text-align: center; padding: 100px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 3.5rem; margin-bottom: 20px; }
+        .empty-state p { font-size: 0.95rem; margin-bottom: 24px; }
+        .empty-state a {
+            padding: 12px 28px; background: var(--gold);
+            border-radius: 6px; color: #0a1628;
+            font-size: 0.9rem; font-weight: 700; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .empty-state a:hover { background: var(--gold-light); }
+
+        footer {
+            position: relative; z-index: 1; margin-top: 40px;
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--gold); }
+        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            main { padding: 24px 20px; }
+            footer { flex-direction: column; gap: 10px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <nav>
+        <a href="/dashboard" class="nav-logo">
+            <div class="nav-logo-icon">📚</div>
+            Libra<span>Space</span>
+        </a>
+        <div class="nav-right">
+            <a href="/dashboard" class="nav-btn">← Dashboard</a>
+            <div class="nav-user">👤 {{ username }}</div>
+            <a href="/logout" class="nav-btn">Sign out</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <div class="page-title">My <span>Reservations</span></div>
+            <div class="page-sub">{{ reserved_books | length }} book{{ 's' if reserved_books | length != 1 }} reserved — cancel anytime.</div>
+        </div>
+
+        {% if reserved_books %}
+        <div class="books-grid">
+            {% for book in reserved_books %}
+            <div class="book-card">
+                <div class="book-cover-wrap">
+                    {% set book_image = book.image_url or book.cover_url %}
+                    {% if book_image %}
+                    <img src="{{ book_image }}" alt="{{ book.title }}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="book-cover-placeholder" style="display:none">📖</div>
+                    {% else %}
+                    <div class="book-cover-placeholder">📖</div>
+                    {% endif %}
+                    <div class="book-genre-badge">{{ book.genre if book.genre else 'General' }}</div>
+                    <div class="reserved-badge">Reserved</div>
+                </div>
+                <div class="book-body">
+                    <div class="book-title">{{ book.title }}</div>
+                    {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
+                </div>
+                <div class="book-footer">
+                    <a href="/book/{{ book.id }}" class="view-btn">View</a>
+                    <a href="/cancel/{{ book.booking_id }}" class="cancel-btn" onclick="return confirm('Cancel this reservation?')">Cancel</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p>You have no reservations yet.</p>
+            <a href="/dashboard">Browse Books</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <div class="footer-logo">📚 LibraSpace</div>
+        <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+        <div class="footer-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="/about">About</a>
+        </div>
+    </footer>
+
+</body>
+</html>
