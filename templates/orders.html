@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — My Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a1628;
+            --surface: #0d1b35;
+            --surface2: #111f3e;
+            --border: #1a2d52;
+            --border2: #1f3660;
+            --gold: #c9a84c;
+            --gold-light: #e8c96a;
+            --text: #e8edf5;
+            --text-muted: #6b7a99;
+            --text-soft: #9aa3bc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+        }
+
+        .grid-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        nav {
+            position: relative; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; height: 64px;
+            background: rgba(10,22,40,0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem; font-weight: 700;
+            color: var(--text); text-decoration: none;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .nav-logo-icon {
+            width: 28px; height: 28px; background: var(--gold);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        }
+
+        .nav-logo span { color: var(--gold); }
+
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+
+        .nav-user {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface2); border: 1px solid var(--border2);
+            border-radius: 6px; padding: 6px 14px;
+            font-size: 0.82rem; color: var(--text-soft);
+        }
+
+        .nav-btn {
+            padding: 7px 16px; background: transparent;
+            border: 1px solid var(--border2); border-radius: 6px;
+            color: var(--text-soft); font-size: 0.82rem;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; transition: all 0.2s;
+        }
+
+        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        main { flex: 1; padding: 36px 40px; max-width: 1280px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+
+        .page-header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text); }
+        .page-title span { color: var(--gold); }
+        .page-sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; }
+
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+
+        .book-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+
+        .book-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+
+        .book-cover-wrap { position: relative; width: 100%; height: 200px; overflow: hidden; }
+
+        .book-cover-img {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+            transition: transform 0.3s;
+        }
+
+        .book-card:hover .book-cover-img { transform: scale(1.04); }
+
+        .book-cover-placeholder {
+            width: 100%; height: 100%;
+            background: var(--surface2);
+            display: flex; align-items: center; justify-content: center; font-size: 3rem;
+        }
+
+        .book-genre-badge {
+            position: absolute; top: 10px; left: 10px;
+            font-size: 0.68rem; font-weight: 600;
+            background: rgba(10,22,40,0.85);
+            border: 1px solid rgba(201,168,76,0.3);
+            color: var(--gold); padding: 3px 10px;
+            border-radius: 100px; backdrop-filter: blur(8px);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .ordered-badge {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 0.65rem; font-weight: 700;
+            background: rgba(74,222,128,0.15);
+            border: 1px solid rgba(74,222,128,0.3);
+            color: #4ade80; padding: 3px 10px;
+            border-radius: 100px; backdrop-filter: blur(8px);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .book-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .book-title { font-size: 0.9rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+        .book-author { font-size: 0.78rem; color: var(--text-muted); }
+        .ordered-at {
+            font-size: 0.7rem; color: var(--text-muted);
+            display: flex; align-items: center; gap: 5px;
+            margin-top: 6px;
+        }
+
+        .book-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            display: flex; gap: 8px;
+        }
+
+        .view-btn {
+            flex: 1; padding: 8px 12px; background: var(--gold);
+            border-radius: 6px; color: #0a1628;
+            font-size: 0.78rem; font-weight: 700;
+            text-decoration: none; text-align: center; transition: all 0.2s;
+        }
+
+        .view-btn:hover { background: var(--gold-light); }
+
+        .cancel-btn {
+            flex: 1; padding: 8px 12px;
+            background: transparent;
+            border: 1px solid rgba(239,68,68,0.3); border-radius: 6px;
+            color: #f87171; font-size: 0.78rem; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; text-align: center; transition: all 0.2s;
+        }
+
+        .cancel-btn:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.5); }
+
+        .empty-state { text-align: center; padding: 100px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 3.5rem; margin-bottom: 20px; }
+        .empty-state p { font-size: 0.95rem; margin-bottom: 24px; }
+        .empty-state a {
+            padding: 12px 28px; background: var(--gold);
+            border-radius: 6px; color: #0a1628;
+            font-size: 0.9rem; font-weight: 700; text-decoration: none;
+            transition: all 0.2s;
+        }
+        .empty-state a:hover { background: var(--gold-light); }
+
+        footer {
+            position: relative; z-index: 1; margin-top: 40px;
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding: 48px 40px 28px;
+        }
+        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 30px; }
+        .footer-brand { max-width: 260px; }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .footer-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+        .footer-col h4 { font-size: 0.75rem; font-weight: 600; color: var(--text-soft); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .footer-col ul a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-col ul a:hover { color: var(--gold); }
+        .footer-bottom { border-top: 1px solid var(--border); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-bottom-links { display: flex; gap: 20px; }
+        .footer-bottom-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-bottom-links a:hover { color: var(--gold); }
+
+        /* ORDER PLACED OVERLAY */
+        .order-overlay {
+            position: fixed; inset: 0; z-index: 999;
+            background: rgba(10,22,40,0.85);
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(6px);
+            animation: overlayFadeIn 0.3s ease both;
+        }
+        @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .order-card {
+            background: var(--surface);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 20px; padding: 52px 60px;
+            text-align: center; position: relative;
+            animation: cardPop 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+        }
+        @keyframes cardPop {
+            from { opacity: 0; transform: scale(0.7); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .order-check {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; margin: 0 auto 24px;
+            animation: checkBounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.4s both;
+        }
+        @keyframes checkBounce {
+            from { opacity: 0; transform: scale(0); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .order-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem; font-weight: 700;
+            color: var(--text); margin-bottom: 10px;
+        }
+        .order-title span { color: var(--gold); }
+        .order-sub { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+
+        .order-dismiss {
+            padding: 12px 36px;
+            background: var(--gold); border: none; border-radius: 8px;
+            color: #0a1628; font-size: 0.95rem; font-weight: 700;
+            font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s;
+        }
+        .order-dismiss:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+        .confetti {
+            position: absolute; width: 8px; height: 8px; border-radius: 2px;
+            animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(220px) rotate(720deg); opacity: 0; }
+        }
+
+        .status-badge { display:inline-block; padding: 3px 10px; border-radius: 100px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-pending   { background: rgba(251,191,36,0.12);  border: 1px solid rgba(251,191,36,0.3);  color: #fde68a; }
+        .status-shipped   { background: rgba(96,165,250,0.12);  border: 1px solid rgba(96,165,250,0.3);  color: #93c5fd; }
+        .status-delivered { background: rgba(74,222,128,0.12);  border: 1px solid rgba(74,222,128,0.3);  color: #86efac; }
+        .status-cancelled { background: rgba(239,68,68,0.08);   border: 1px solid rgba(239,68,68,0.25);  color: #fca5a5; }
+
+        /* SILENT CONFIRM */
+        .confirm-overlay { position:fixed;inset:0;z-index:99999;background:rgba(10,22,40,0.7);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px); }
+        .confirm-box { background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:28px 32px;text-align:center;min-width:280px;box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+        .confirm-msg { font-size:0.92rem;color:var(--text);margin-bottom:20px; }
+        .confirm-actions { display:flex;gap:10px;justify-content:center; }
+        .confirm-yes { padding:9px 24px;background:var(--gold);border:none;border-radius:7px;color:#0a1628;font-size:0.85rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:background 0.2s; }
+        .confirm-yes:hover { background:var(--gold-light); }
+        .confirm-no { padding:9px 20px;background:transparent;border:1px solid var(--border2);border-radius:7px;color:var(--text-soft);font-size:0.85rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.2s; }
+        .confirm-no:hover { border-color:var(--gold);color:var(--gold); }
+
+        .status-popup {
+            position: fixed; top: 80px; right: 24px; z-index: 9999;
+            background: var(--surface); border: 1px solid rgba(201,168,76,0.35);
+            border-radius: 14px; padding: 20px 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            min-width: 280px; max-width: 340px;
+            animation: slideIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+            display: none;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .status-popup-close {
+            position: absolute; top: 10px; right: 14px;
+            background: none; border: none; color: var(--text-muted);
+            font-size: 1rem; cursor: pointer; line-height: 1;
+        }
+        .status-popup-icon { font-size: 1.8rem; margin-bottom: 8px; }
+        .status-popup-title { font-size: 0.82rem; font-weight: 700; color: var(--gold); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.8px; }
+        .status-popup-msg { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
+        .status-popup-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .status-popup-item { font-size: 0.8rem; color: var(--text-soft); display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--surface2); border-radius: 7px; }
+            nav { padding: 0 20px; }
+            main { padding: 24px 20px; }
+            footer { padding: 36px 24px 20px; }
+            .footer-top { flex-direction: column; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <nav>
+        <a href="/dashboard" class="nav-logo">
+            <div class="nav-logo-icon">📚</div>
+            Libra<span>Space</span>
+        </a>
+        <div class="nav-right">
+            <a href="/dashboard" class="nav-btn">← Dashboard</a>
+            <div class="nav-user">👤 {{ username }}</div>
+            <a href="/logout" class="nav-btn">Sign out</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <div class="page-title">My <span>Orders</span></div>
+            <div class="page-sub">{{ ordered_books | length }} book{{ 's' if ordered_books | length != 1 }} purchased.</div>
+        </div>
+
+        {% if ordered_books %}
+        <div class="books-grid">
+            {% for book in ordered_books %}
+            <div class="book-card">
+                <div class="book-cover-wrap">
+                    {% set book_image = book.image_url or book.cover_url %}
+                    {% if book_image %}
+                    <img src="{{ book_image }}" alt="{{ book.title }}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="book-cover-placeholder" style="display:none">📖</div>
+                    {% else %}
+                    <div class="book-cover-placeholder">📖</div>
+                    {% endif %}
+                    <div class="book-genre-badge">{{ book.genre if book.genre else 'General' }}</div>
+                    <div class="ordered-badge">Purchased</div>
+                </div>
+                <div class="book-body">
+                    <div class="book-title">{{ book.title }}</div>
+                    {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
+                    {% if book.price %}<div class="book-price">₱{{ book.price }}</div>{% endif %}
+                    {% set s = book.status or 'pending' %}
+                    <div style="margin-top:6px;">
+                        <span class="status-badge status-{{ s }}">
+                            {% if s == 'pending' %}⏳ Pending
+                            {% elif s == 'shipped' %}🚚 Shipped
+                            {% elif s == 'delivered' %}✅ Delivered
+                            {% elif s == 'cancelled' %}✕ Cancelled
+                            {% else %}{{ s }}{% endif %}
+                        </span>
+                    </div>
+                    {% if book.ordered_at %}
+                    <div class="ordered-at">🕐 {{ book.ordered_at[:10] }} at {{ book.ordered_at[11:16] }}</div>
+                    {% endif %}
+                </div>
+                <div class="book-footer">
+                    <a href="/book/{{ book.id }}" class="view-btn">View</a>
+                    {% if (book.status or 'pending') == 'pending' %}
+                    <a href="/order/cancel/{{ book.order_id }}" class="cancel-btn" onclick="return silentConfirm(this, 'Cancel this order?')">Cancel</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <p>You have no orders yet.</p>
+            <a href="/dashboard">Browse Books</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-logo">📚 LibraSpace</div>
+                <div class="footer-desc">A modern online book store built to make buying books more accessible and enjoyable for everyone.</div>
+            </div>
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="/dashboard">All Books</a></li>
+                    <li><a href="/cart">My Cart</a></li>
+                    <li><a href="/orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/features">Features</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SILENT CONFIRM -->
+    <div class="confirm-overlay" id="confirmOverlay" style="display:none;">
+        <div class="confirm-box">
+            <div class="confirm-msg" id="confirmMsg"></div>
+            <div class="confirm-actions">
+                <button class="confirm-yes" id="confirmYes">Yes</button>
+                <button class="confirm-no" id="confirmNo">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS POPUP -->
+    <div class="status-popup" id="statusPopup">
+        <button class="status-popup-close" onclick="closePopup()">✕</button>
+        <div class="status-popup-icon" id="popupIcon">📦</div>
+        <div class="status-popup-title" id="popupTitle">Order Update</div>
+        <div class="status-popup-msg" id="popupMsg"></div>
+        <div class="status-popup-list" id="popupList"></div>
+    </div>
+
+    {% if request.args.get('checkout') == '1' %}
+    <div class="order-overlay" id="orderOverlay">
+        <div class="order-card" id="orderCard">
+            <div class="order-check">✓</div>
+            <div class="order-title">Order <span>Placed!</span></div>
+            <div class="order-sub">Your books have been successfully purchased.<br>Thank you for shopping with LibraSpace!</div>
+            <button class="order-dismiss" onclick="dismissOverlay()">View My Orders</button>
+        </div>
+    </div>
+    <script>
+        function spawnConfetti() {
+            const colors = ['#c9a84c', '#e8c96a', '#4ade80', '#60a5fa', '#f472b6'];
+            const card = document.getElementById('orderCard');
+            for (let i = 0; i < 30; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.cssText = `
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 40}%;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    animation-duration: ${0.8 + Math.random() * 1.2}s;
+                    animation-delay: ${Math.random() * 0.5}s;
+                `;
+                card.appendChild(c);
+            }
+        }
+        function dismissOverlay() {
+            document.getElementById('orderOverlay').style.opacity = '0';
+            document.getElementById('orderOverlay').style.transition = 'opacity 0.3s';
+            setTimeout(() => document.getElementById('orderOverlay').remove(), 300);
+        }
+        spawnConfetti();
+        setTimeout(dismissOverlay, 4000);
+    </script>
+    {% endif %}
+    <script>
+        // ── SILENT CONFIRM ──
+        function silentConfirm(anchor, msg) {
+            const overlay = document.getElementById('confirmOverlay');
+            document.getElementById('confirmMsg').textContent = msg;
+            overlay.style.display = 'flex';
+            document.getElementById('confirmYes').onclick = () => { overlay.style.display='none'; window.location = anchor.href; };
+            document.getElementById('confirmNo').onclick  = () => { overlay.style.display='none'; };
+            return false;
+        }
+
+        // ── ORDER SUMMARY POPUP (on page load) ──
+        const orders = [
+            {% for book in ordered_books %}
+            { title: {{ book.title | tojson }}, status: {{ (book.status or 'pending') | tojson }} },
+            {% endfor %}
+        ];
+
+        const statusIcon = { pending: '⏳', shipped: '🚚', delivered: '✅', cancelled: '✕' };
+        const statusLabel = { pending: 'Pending', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' };
+
+        function closePopup() {
+            const p = document.getElementById('statusPopup');
+            p.style.animation = 'none';
+            p.style.opacity = '0';
+            p.style.transition = 'opacity 0.25s';
+            setTimeout(() => p.style.display = 'none', 250);
+        }
+
+        function showSummaryPopup() {
+            if (!orders.length) return;
+            const popup = document.getElementById('statusPopup');
+            const list  = document.getElementById('popupList');
+            document.getElementById('popupIcon').textContent = '📦';
+            document.getElementById('popupTitle').textContent = 'Your Orders';
+            document.getElementById('popupMsg').textContent = `You have ${orders.length} order${orders.length > 1 ? 's' : ''}.`;
+            list.innerHTML = orders.map(o =>
+                `<div class="status-popup-item">${statusIcon[o.status] || '📖'} <span>${o.title}</span> <span style="margin-left:auto;font-size:0.72rem;opacity:0.7">${statusLabel[o.status] || o.status}</span></div>`
+            ).join('');
+            popup.style.display = 'block';
+            setTimeout(closePopup, 6000);
+        }
+
+        // ── STATUS CHANGE POLL (every 30s) ──
+        const savedStatuses = JSON.parse(localStorage.getItem('orderStatuses') || '{}');
+
+        function pollStatuses() {
+            fetch('/orders/statuses')
+                .then(r => r.json())
+                .then(data => {
+                    let changed = [];
+                    data.forEach(o => {
+                        const prev = savedStatuses[o.id];
+                        if (prev && prev !== o.status) {
+                            changed.push({ title: o.title, from: prev, to: o.status });
+                        }
+                        savedStatuses[o.id] = o.status;
+                    });
+                    localStorage.setItem('orderStatuses', JSON.stringify(savedStatuses));
+                    if (changed.length) showChangePopup(changed);
+                })
+                .catch(() => {});
+        }
+
+        function showChangePopup(changed) {
+            const popup = document.getElementById('statusPopup');
+            const list  = document.getElementById('popupList');
+            document.getElementById('popupIcon').textContent = '🔔';
+            document.getElementById('popupTitle').textContent = 'Order Status Updated!';
+            document.getElementById('popupMsg').textContent = `${changed.length} order${changed.length > 1 ? 's have' : ' has'} been updated.`;
+            list.innerHTML = changed.map(c =>
+                `<div class="status-popup-item">📖 <span>${c.title}</span> <span style="margin-left:auto;font-size:0.72rem">${statusIcon[c.from] || ''} → ${statusIcon[c.to] || ''} ${statusLabel[c.to] || c.to}</span></div>`
+            ).join('');
+            popup.style.display = 'block';
+            popup.style.animation = 'slideIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both';
+            setTimeout(closePopup, 7000);
+        }
+
+        // Show summary on load (skip if checkout overlay is showing)
+        {% if not request.args.get('checkout') %}
+        setTimeout(showSummaryPopup, 600);
+        {% endif %}
+        pollStatuses();
+        setInterval(pollStatuses, 30000);
+    </script>
+
+</body>
+</html>

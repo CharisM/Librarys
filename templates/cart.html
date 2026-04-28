@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a1628; --surface: #0d1b35; --surface2: #111f3e;
+            --border: #1a2d52; --border2: #1f3660;
+            --gold: #c9a84c; --gold-light: #e8c96a;
+            --text: #e8edf5; --text-muted: #6b7a99; --text-soft: #9aa3bc;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+        nav { position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 64px; background: rgba(10,22,40,0.95); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px); }
+        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-logo-icon { width: 28px; height: 28px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .nav-logo span { color: var(--gold); }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .nav-user { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 14px; font-size: 0.82rem; color: var(--text-soft); }
+        .nav-btn { padding: 7px 16px; background: transparent; border: 1px solid var(--border2); border-radius: 6px; color: var(--text-soft); font-size: 0.82rem; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        main { flex: 1; padding: 40px; max-width: 900px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+
+        .page-header { margin-bottom: 32px; }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text); }
+        .page-title span { color: var(--gold); }
+        .page-sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; }
+
+        .cart-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+
+        .cart-items { display: flex; flex-direction: column; gap: 12px; }
+
+        .cart-item {
+            display: flex; gap: 16px; align-items: center;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px;
+            transition: border-color 0.2s;
+        }
+        .cart-item:hover { border-color: var(--border2); }
+
+        .cart-item-img {
+            width: 60px; height: 80px; border-radius: 6px;
+            object-fit: cover; flex-shrink: 0;
+            background: var(--surface2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; overflow: hidden;
+        }
+        .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+
+        .cart-item-info { flex: 1; }
+        .cart-item-title { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .cart-item-author { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px; }
+        .cart-item-price { font-size: 1rem; font-weight: 700; color: var(--gold); }
+
+        .cart-item-remove {
+            padding: 6px 12px; background: transparent;
+            border: 1px solid rgba(239,68,68,0.3); border-radius: 6px;
+            color: #f87171; font-size: 0.75rem; font-weight: 600;
+            text-decoration: none; transition: all 0.2s; white-space: nowrap;
+        }
+        .cart-item-remove:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.5); }
+
+        .cart-summary {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 24px;
+            position: sticky; top: 20px;
+        }
+        .summary-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+        .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.875rem; color: var(--text-muted); }
+        .summary-row.total { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 4px; font-size: 1rem; font-weight: 700; color: var(--text); }
+        .summary-row.total span:last-child { color: var(--gold); font-size: 1.2rem; }
+
+        .checkout-btn {
+            display: block; width: 100%; padding: 13px;
+            background: var(--gold); border: none; border-radius: 8px;
+            color: #0a1628; font-size: 0.95rem; font-weight: 700;
+            font-family: 'Inter', sans-serif; text-decoration: none;
+            text-align: center; margin-top: 20px; transition: all 0.2s;
+        }
+        .checkout-btn:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.3); }
+
+        .continue-btn {
+            display: block; width: 100%; padding: 11px;
+            background: transparent; border: 1px solid var(--border2);
+            border-radius: 8px; color: var(--text-soft);
+            font-size: 0.875rem; font-family: 'Inter', sans-serif;
+            text-decoration: none; text-align: center;
+            margin-top: 10px; transition: all 0.2s;
+        }
+        .continue-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .empty-state { text-align: center; padding: 100px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 3.5rem; margin-bottom: 20px; }
+        .empty-state p { font-size: 0.95rem; margin-bottom: 24px; }
+        .empty-state a { padding: 12px 28px; background: var(--gold); border-radius: 6px; color: #0a1628; font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: all 0.2s; }
+        .empty-state a:hover { background: var(--gold-light); }
+
+        footer { position: relative; z-index: 1; margin-top: 40px; background: var(--surface); border-top: 1px solid var(--border); padding: 48px 40px 28px; }
+        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 30px; }
+        .footer-brand { max-width: 260px; }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .footer-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+        .footer-col h4 { font-size: 0.75rem; font-weight: 600; color: var(--text-soft); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .footer-col ul a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-col ul a:hover { color: var(--gold); }
+        .footer-bottom { border-top: 1px solid var(--border); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-bottom-links { display: flex; gap: 20px; }
+        .footer-bottom-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-bottom-links a:hover { color: var(--gold); }
+
+        @media (max-width: 768px) {
+            main { padding: 24px 20px; }
+            .cart-layout { grid-template-columns: 1fr; }
+            footer { padding: 36px 24px 20px; }
+            .footer-top { flex-direction: column; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <nav>
+        <a href="/dashboard" class="nav-logo">
+            <div class="nav-logo-icon">📚</div>
+            Libra<span>Space</span>
+        </a>
+        <div class="nav-right">
+            <a href="/dashboard" class="nav-btn">← Shop</a>
+            <div class="nav-user">👤 {{ username }}</div>
+            <a href="/logout" class="nav-btn">Sign out</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="page-header">
+            <div class="page-title">Your <span>Cart</span></div>
+            <div class="page-sub">{{ cart_books | length }} item{{ 's' if cart_books | length != 1 }}</div>
+        </div>
+
+        {% if cart_books %}
+        <div class="cart-layout">
+            <div class="cart-items">
+                {% for book in cart_books %}
+                <div class="cart-item">
+                    <div class="cart-item-img">
+                        {% set book_image = book.image_url or book.cover_url %}
+                        {% if book_image %}
+                        <img src="{{ book_image }}" alt="{{ book.title }}" onerror="this.style.display='none'">
+                        {% else %}📖{% endif %}
+                    </div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">{{ book.title }}</div>
+                        {% if book.author %}<div class="cart-item-author">{{ book.author }}</div>{% endif %}
+                        <div class="cart-item-price">₱{{ book.price }}</div>
+                    </div>
+                    <a href="/cart/remove/{{ book.id }}" class="cart-item-remove">Remove</a>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-title">Order Summary</div>
+                {% for book in cart_books %}
+                <div class="summary-row">
+                    <span>{{ book.title[:28] }}{% if book.title | length > 28 %}…{% endif %}</span>
+                    <span>₱{{ book.price }}</span>
+                </div>
+                {% endfor %}
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>₱{{ total }}</span>
+                </div>
+                <a href="/cart/checkout" class="checkout-btn">Checkout →</a>
+                <a href="/dashboard" class="continue-btn">Continue Shopping</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <p>Your cart is empty.</p>
+            <a href="/dashboard">Browse Books</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-logo">📚 LibraSpace</div>
+                <div class="footer-desc">A modern online book store built to make buying books more accessible and enjoyable for everyone.</div>
+            </div>
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="/dashboard">All Books</a></li>
+                    <li><a href="/cart">My Cart</a></li>
+                    <li><a href="/orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/features">Features</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

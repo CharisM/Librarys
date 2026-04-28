@@ -236,10 +236,11 @@
                 <div class="book-body">
                     <div class="book-title">{{ book.title }}</div>
                     {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
+                    {% if book.reserved_at %}<div class="book-author" style="margin-top:4px;font-size:0.72rem;">📅 {{ book.reserved_at[:10] }}</div>{% endif %}
                 </div>
                 <div class="book-footer">
                     <a href="/book/{{ book.id }}" class="view-btn">View</a>
-                    <a href="/cancel/{{ book.booking_id }}" class="cancel-btn" onclick="return confirm('Cancel this reservation?')">Cancel</a>
+                    <a href="/cancel/{{ book.booking_id }}" class="cancel-btn" onclick="return silentConfirm(this, 'Cancel this reservation?')">Cancel</a>
                 </div>
             </div>
             {% endfor %}
@@ -263,5 +264,24 @@
         </div>
     </footer>
 
+    <div style="position:fixed;inset:0;z-index:99999;background:rgba(10,22,40,0.7);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);" id="resConfirmOverlay">
+        <div style="background:#0d1b35;border:1px solid #1f3660;border-radius:12px;padding:28px 32px;text-align:center;min-width:280px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+            <div style="font-size:0.92rem;color:#e8edf5;margin-bottom:20px;" id="resConfirmMsg"></div>
+            <div style="display:flex;gap:10px;justify-content:center;">
+                <button style="padding:9px 24px;background:#c9a84c;border:none;border-radius:7px;color:#0a1628;font-size:0.85rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;" id="resConfirmYes">Yes</button>
+                <button style="padding:9px 20px;background:transparent;border:1px solid #1f3660;border-radius:7px;color:#9aa3bc;font-size:0.85rem;font-family:'Inter',sans-serif;cursor:pointer;" id="resConfirmNo">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function silentConfirm(anchor, msg) {
+            const overlay = document.getElementById('resConfirmOverlay');
+            document.getElementById('resConfirmMsg').textContent = msg;
+            overlay.style.display = 'flex';
+            document.getElementById('resConfirmYes').onclick = () => { overlay.style.display='none'; window.location = anchor.href; };
+            document.getElementById('resConfirmNo').onclick  = () => { overlay.style.display='none'; };
+            return false;
+        }
+    </script>
 </body>
 </html>

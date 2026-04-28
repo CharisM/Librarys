@@ -150,56 +150,147 @@
         footer {
             position: relative;
             z-index: 1;
-            background: var(--surface);
+            background: linear-gradient(180deg, #0b1a30 0%, #060e1c 100%);
             border-top: 1px solid var(--border);
-            padding: 48px 60px 28px;
+            overflow: hidden;
+        }
+
+        .footer-glow {
+            position: absolute;
+            width: 500px; height: 300px;
+            background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+            top: -80px; left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .footer-inner {
+            position: relative;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 60px 40px 32px;
         }
 
         .footer-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            gap: 30px;
+            display: grid;
+            grid-template-columns: 1.8fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
         }
 
-        .footer-brand { max-width: 280px; }
-        .footer-logo {
+        .footer-brand-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--gold);
-            margin-bottom: 12px;
+            font-size: 1.3rem; font-weight: 700;
+            color: var(--text);
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 14px;
+            text-decoration: none;
+        }
+        .footer-brand-logo span { color: var(--gold); }
+        .footer-brand-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+        }
+        .footer-tagline {
+            font-size: 0.84rem; color: var(--text-muted);
+            line-height: 1.8; margin-bottom: 22px; max-width: 260px;
+        }
+        .footer-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(74,222,128,0.07);
+            border: 1px solid rgba(74,222,128,0.18);
+            border-radius: 100px; padding: 5px 13px;
+            font-size: 0.71rem; color: #4ade80; font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .footer-badge-dot {
+            width: 6px; height: 6px;
+            background: #4ade80; border-radius: 50%;
+            animation: fp 2s ease-in-out infinite;
+        }
+        @keyframes fp { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.6)} }
+
+        .footer-col-title {
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--text-soft); text-transform: uppercase;
+            letter-spacing: 1.4px; margin-bottom: 20px;
             display: flex; align-items: center; gap: 8px;
         }
-        .footer-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; }
+        .footer-col-title::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .footer-col ul li a {
+            font-size: 0.84rem; color: var(--text-muted);
+            text-decoration: none; transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .footer-col ul li a::before {
+            content: '';
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            background: var(--border2);
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .footer-col ul li a:hover { color: var(--gold); transform: translateX(3px); }
+        .footer-col ul li a:hover::before { background: var(--gold); }
 
-        .footer-col h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-soft); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
-        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .footer-col ul a { font-size: 0.85rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-        .footer-col ul a:hover { color: var(--gold); }
-
-        .footer-bottom {
-            border-top: 1px solid var(--border);
-            padding-top: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                var(--border) 20%,
+                rgba(201,168,76,0.3) 50%,
+                var(--border) 80%,
+                transparent 100%);
+            margin-bottom: 28px;
         }
 
-        .footer-copy { font-size: 0.8rem; color: var(--text-muted); }
-        .footer-bottom-links { display: flex; gap: 24px; }
-        .footer-bottom-links a { font-size: 0.8rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-        .footer-bottom-links a:hover { color: var(--gold); }
+        .footer-bottom {
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .footer-copy {
+            font-size: 0.78rem; color: var(--text-muted);
+        }
+        .footer-copy strong { color: var(--gold); font-weight: 600; }
+        .footer-socials { display: flex; gap: 8px; }
+        .footer-social {
+            width: 36px; height: 36px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 0.9rem;
+            transition: all 0.25s; color: var(--text-muted);
+        }
+        .footer-social:hover {
+            border-color: var(--gold);
+            background: rgba(201,168,76,0.08);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(201,168,76,0.15);
+        }
+        .footer-legal { display: flex; gap: 20px; }
+        .footer-legal a {
+            font-size: 0.76rem; color: var(--text-muted);
+            text-decoration: none; transition: color 0.2s;
+        }
+        .footer-legal a:hover { color: var(--gold); }
 
         @media (max-width: 900px) {
             nav { padding: 0 24px; }
             .nav-links { display: none; }
-            footer { padding: 40px 24px 20px; }
-            .footer-top { flex-direction: column; }
+            .footer-inner { padding: 40px 24px 24px; }
+            .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+        }
+        @media (max-width: 560px) {
+            .footer-top { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; text-align: center; }
         }
 
         {% block extra_styles %}{% endblock %}
@@ -220,6 +311,7 @@
             <li><a href="/" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
             <li><a href="/features" class="{{ 'active' if active_page == 'features' }}">Features</a></li>
             <li><a href="/about" class="{{ 'active' if active_page == 'about' }}">About</a></li>
+            <li><a href="/contact" class="{{ 'active' if active_page == 'contact' }}">Contact</a></li>
         </ul>
         <div class="nav-actions">
             <a href="/login" class="btn-ghost">Sign In</a>
@@ -232,42 +324,61 @@
     </main>
 
     <footer>
-        <div class="footer-top">
-            <div class="footer-brand">
-                <div class="footer-logo">📚 LibraSpace</div>
-                <div class="footer-desc">A modern library booking system built to make reading more accessible and enjoyable for everyone.</div>
+        <div class="footer-glow"></div>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="/" class="footer-brand-logo">
+                        <div class="footer-brand-icon">📚</div>
+                        Libra<span>Space</span>
+                    </a>
+                    <p class="footer-tagline">Your curated digital library — discover, reserve, and enjoy great books from anywhere.</p>
+                    <div class="footer-badge">
+                        <div class="footer-badge-dot"></div>
+                        All systems operational
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Navigate</div>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/features">Features</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Account</div>
+                    <ul>
+                        <li><a href="/login">Sign In</a></li>
+                        <li><a href="/register">Sign Up</a></li>
+                        <li><a href="/dashboard">Browse Books</a></li>
+                        <li><a href="/profile">My Profile</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Legal</div>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="/contact">Support</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="footer-col">
-                <h4>Navigation</h4>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/features">Features</a></li>
-                    <li><a href="/about">About</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Account</h4>
-                <ul>
-                    <li><a href="/login">Sign In</a></li>
-                    <li><a href="/register">Sign Up</a></li>
-                    <li><a href="/dashboard">Dashboard</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Support</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
-            <div class="footer-bottom-links">
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-                <a href="#">Support</a>
+            <div class="footer-divider"></div>
+            <div class="footer-bottom">
+                <div class="footer-copy">© 2025 <strong>LibraSpace</strong> — Crafted for book lovers.</div>
+                <div class="footer-socials">
+                    <a href="#" class="footer-social" title="Twitter">𝕏</a>
+                    <a href="#" class="footer-social" title="GitHub">⌥</a>
+                    <a href="#" class="footer-social" title="Email">✉</a>
+                </div>
+                <div class="footer-legal">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="/contact">Support</a>
+                </div>
             </div>
         </div>
     </footer>

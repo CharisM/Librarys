@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — Admin Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #070e1a; --surface: #0c1628; --surface2: #101e35;
+            --border: #182a48; --border2: #1e3358;
+            --gold: #c9a84c; --gold-light: #e8c96a;
+            --text: #e8edf5; --text-muted: #5a6a88; --text-soft: #8a96b4;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.025) 1px, transparent 1px); background-size: 56px 56px; }
+        .glow { position: fixed; width: 500px; height: 500px; background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 0; }
+
+        .card { position: relative; z-index: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 44px 40px; width: 100%; max-width: 400px; box-shadow: 0 32px 80px rgba(0,0,0,0.5); }
+
+        .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; justify-content: center; }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 0 20px rgba(201,168,76,0.3); }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); }
+        .logo-text span { color: var(--gold); }
+
+        .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); border-radius: 100px; padding: 5px 14px; font-size: 0.72rem; color: var(--gold); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 20px; }
+
+        h1 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 28px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        label { font-size: 0.72rem; font-weight: 600; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.8px; }
+        input { padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-size: 0.88rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; }
+        input:focus { border-color: var(--gold); }
+        input::placeholder { color: var(--text-muted); }
+
+        .btn { width: 100%; padding: 12px; background: var(--gold); border: none; border-radius: 8px; color: #070e1a; font-size: 0.92rem; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; margin-top: 8px; letter-spacing: 0.3px; }
+        .btn:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+
+        .error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; padding: 10px 14px; font-size: 0.82rem; color: #fca5a5; margin-bottom: 16px; }
+
+        .back-link { display: block; text-align: center; margin-top: 20px; font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .back-link:hover { color: var(--gold); }
+
+        .divider { height: 1px; background: var(--border); margin: 24px 0; }
+        .hint { font-size: 0.72rem; color: var(--text-muted); text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow"></div>
+
+    <div class="card">
+        <div class="logo">
+            <div class="logo-icon">📚</div>
+            <div class="logo-text">Libra<span>Space</span></div>
+        </div>
+
+        <div style="text-align:center;">
+            <div class="badge">🛡️ Admin Portal</div>
+            <h1>Admin Login</h1>
+            <div class="sub">Sign in with your admin credentials</div>
+        </div>
+
+        {% if error %}
+        <div class="error">⚠ {{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/admin/login">
+            <div class="form-group">
+                <label>Admin Username</label>
+                <input type="text" name="username" placeholder="Enter admin username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Admin Password</label>
+                <input type="password" name="password" placeholder="Enter admin password" required>
+            </div>
+            <button type="submit" class="btn">Sign In to Admin →</button>
+        </form>
+
+        <div class="divider"></div>
+        <div class="hint">This page is for administrators only.</div>
+        <a href="/login" class="back-link">← Back to User Login</a>
+    </div>
+</body>
+</html>

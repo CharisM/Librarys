@@ -57,13 +57,20 @@
 }
 
 .feature-icon {
-    width: 52px; height: 52px;
-    background: rgba(201,168,76,0.1);
-    border: 1px solid rgba(201,168,76,0.2);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem; margin-bottom: 20px;
+    width: 100%; height: 180px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
 }
+
+.feature-icon img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.feature-card:hover .feature-icon img { transform: scale(1.05); }
 
 .feature-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 10px; }
 .feature-desc { font-size: 0.875rem; color: var(--text-muted); line-height: 1.75; }
@@ -118,46 +125,46 @@
 <div class="page-wrap">
     <div class="page-hero">
         <div class="page-eyebrow">Why LibraSpace</div>
-        <h1 class="page-title">Everything you need to<br><span class="highlight">manage your reading</span></h1>
-        <p class="page-sub">A seamless experience from browsing to booking — built for modern readers.</p>
+        <h1 class="page-title">Everything you need to<br><span class="highlight">buy your next book</span></h1>
+        <p class="page-sub">A seamless experience from browsing to buying — built for modern book lovers.</p>
     </div>
 
     <div class="features-grid">
         <div class="feature-card">
-            <div class="feature-icon">📖</div>
-            <div class="feature-title">Easy Book Browsing</div>
-            <div class="feature-desc">Browse our full collection with a clean, intuitive interface designed for speed and simplicity. Filter by genre or search by title.</div>
+            <div class="feature-icon"><img src="/static/img/THENOTEBOOK.jpg" alt="The Notebook"></div>
+            <div class="feature-title">The Notebook</div>
+            <div class="feature-desc">Browse our full collection with a clean, intuitive interface. Filter by genre or search by title to find your next read.</div>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🔖</div>
-            <div class="feature-title">Instant Reservations</div>
-            <div class="feature-desc">Reserve any book in one click. Your booking is confirmed instantly — no waiting, no paperwork, no hassle.</div>
+            <div class="feature-icon"><img src="/static/img/MEBEFOREYOU.jpg" alt="Me Before You"></div>
+            <div class="feature-title">Me Before You</div>
+            <div class="feature-desc">Buy any book in one click. Your order is confirmed instantly — no waiting, no paperwork, no hassle.</div>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">🔐</div>
-            <div class="feature-title">Secure Accounts</div>
-            <div class="feature-desc">Your account and reading history are protected with secure password hashing and private session management.</div>
+            <div class="feature-icon"><img src="/static/img/THEGREATGATSBY.jpg" alt="The Great Gatsby"></div>
+            <div class="feature-title">The Great Gatsby</div>
+            <div class="feature-desc">Your account and order history are protected with secure password hashing and private session management.</div>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">📱</div>
-            <div class="feature-title">Mobile Friendly</div>
-            <div class="feature-desc">Access LibraSpace from any device — desktop, tablet, or phone. Fully responsive design that works everywhere.</div>
+            <div class="feature-icon"><img src="/static/img/AWALKTOREMEMBER.jpg" alt="A Walk to Remember"></div>
+            <div class="feature-title">A Walk to Remember</div>
+            <div class="feature-desc">Shop from any device — desktop, tablet, or phone. Fully responsive design that works everywhere.</div>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <div class="feature-title">Fast & Reliable</div>
+            <div class="feature-icon"><img src="/static/img/UGLYLOVE.jpg" alt="Ugly Love"></div>
+            <div class="feature-title">Ugly Love</div>
             <div class="feature-desc">Powered by Supabase cloud database for lightning-fast performance and high availability around the clock.</div>
         </div>
         <div class="feature-card">
-            <div class="feature-icon">📋</div>
-            <div class="feature-title">Reservation Management</div>
-            <div class="feature-desc">View all your reserved books in one place and cancel any reservation instantly with a single click.</div>
+            <div class="feature-icon"><img src="/static/img/THELITTLEPRINCE.jpg" alt="The Little Prince"></div>
+            <div class="feature-title">The Little Prince</div>
+            <div class="feature-desc">View all your purchased books in one place and cancel any order instantly with a single click.</div>
         </div>
     </div>
 
     <div class="cta-section">
-        <h2>Ready to start <span>reading?</span></h2>
-        <p>Join LibraSpace today and get instant access to our entire book collection — completely free.</p>
+        <h2>Ready to start <span>shopping?</span></h2>
+        <p>Join LibraSpace today and get instant access to our entire book collection.</p>
         <a href="/register" class="cta-btn">Get Started Free →</a>
     </div>
 </div>

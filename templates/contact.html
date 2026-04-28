@@ -2,103 +2,183 @@
 {% block title %}Contact{% endblock %}
 
 {% block extra_styles %}
-.page-wrap { padding: 80px 60px; max-width: 900px; margin: 0 auto; }
+.page-wrap { padding: 80px 60px; max-width: 1100px; margin: 0 auto; }
 
-.page-hero { text-align: center; margin-bottom: 60px; }
-.page-label { font-size: 0.78rem; font-weight: 600; color: var(--purple-light); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; }
-.page-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
-.page-title .gradient { background: linear-gradient(135deg, #a78bfa, #e879f9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.page-sub { font-size: 1rem; color: var(--text-muted); max-width: 500px; margin: 0 auto; line-height: 1.7; }
+.page-hero { text-align: center; margin-bottom: 64px; }
 
-.contact-wrap { display: grid; grid-template-columns: 1fr 1.6fr; gap: 30px; align-items: start; }
+.page-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 100px; padding: 5px 16px;
+    font-size: 0.72rem; color: var(--gold); font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;
+}
 
-.contact-info { display: flex; flex-direction: column; gap: 16px; }
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700; letter-spacing: -0.5px;
+    margin-bottom: 18px; color: var(--text); line-height: 1.2;
+}
+
+.page-title .highlight { color: var(--gold); }
+
+.page-sub {
+    font-size: 1rem; color: var(--text-muted);
+    max-width: 480px; margin: 0 auto; line-height: 1.8;
+}
+
+/* LAYOUT */
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 40px; align-items: start;
+}
+
+/* INFO CARDS */
+.info-stack { display: flex; flex-direction: column; gap: 16px; }
 
 .info-card {
-    background: var(--surface2);
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 22px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: border-color 0.2s;
+    border-radius: 12px; padding: 22px 24px;
+    display: flex; align-items: flex-start; gap: 16px;
+    transition: border-color 0.2s, transform 0.2s;
 }
 
-.info-card:hover { border-color: var(--purple); }
-.info-icon { font-size: 1.5rem; width: 44px; height: 44px; background: linear-gradient(135deg, #3b0764, #5b21b6); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.info-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.info-card:hover { border-color: var(--gold); transform: translateX(4px); }
+
+.info-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+}
+
+.info-label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
 .info-value { font-size: 0.9rem; font-weight: 500; color: var(--text); }
 
-.contact-card {
-    background: var(--surface2);
+/* FORM CARD */
+.form-card {
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px;
+    border-radius: 14px; padding: 36px;
 }
 
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.contact-full { grid-column: 1 / -1; }
-
-.form-group { display: flex; flex-direction: column; gap: 7px; }
-
-label { font-size: 0.78rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.6px; }
-
-input, textarea {
-    padding: 12px 16px;
-    background: #240f3d;
-    border: 1px solid var(--border2);
-    border-radius: 10px;
-    color: var(--text);
-    font-size: 0.9rem;
-    font-family: 'Inter', sans-serif;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    resize: none;
+.form-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700;
+    color: var(--text); margin-bottom: 6px;
 }
 
-input::placeholder, textarea::placeholder { color: #4a3a6a; }
-input:focus, textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.18); }
+.form-card-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 28px; }
 
-.btn-submit {
-    width: 100%;
-    padding: 13px;
-    background: linear-gradient(135deg, var(--purple), var(--purple-light));
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.15s;
-    box-shadow: 0 4px 20px rgba(124,58,237,0.35);
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.form-group { margin-bottom: 18px; }
+
+label {
+    display: block; font-size: 0.72rem; font-weight: 600;
+    color: var(--text-soft); margin-bottom: 7px;
+    text-transform: uppercase; letter-spacing: 0.8px;
 }
 
-.btn-submit:hover { opacity: 0.88; transform: translateY(-2px); }
+.input-wrap { position: relative; }
 
-@media (max-width: 768px) {
+.input-icon {
+    position: absolute; left: 13px; top: 50%;
+    transform: translateY(-50%); font-size: 0.85rem;
+    opacity: 0.35; pointer-events: none;
+}
+
+.input-icon.top { top: 14px; transform: none; }
+
+input, textarea, select {
+    width: 100%; padding: 11px 14px 11px 38px;
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--text);
+    font-size: 0.875rem; font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+}
+
+textarea { padding: 11px 14px 11px 38px; resize: vertical; min-height: 120px; }
+select { appearance: none; cursor: pointer; }
+
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1); }
+
+.submit-btn {
+    width: 100%; padding: 13px;
+    background: var(--gold); border: none; border-radius: 8px;
+    color: #0a1628; font-size: 0.95rem; font-weight: 700;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.3px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+.submit-btn:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,168,76,0.3); }
+
+.alert { border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.875rem; }
+.alert-success { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.25); color: #bbf7d0; }
+
+/* SUCCESS STATE */
+.success-state {
+    text-align: center; padding: 40px 20px;
+    animation: fadeInUp 0.5s ease both;
+}
+
+.success-ring {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: rgba(74,222,128,0.1);
+    border: 2px solid rgba(74,222,128,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; margin: 0 auto 20px;
+    animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+.success-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.success-title span { color: #4ade80; }
+.success-sub { font-size: 0.875rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 24px; }
+.btn-back { display: inline-block; padding: 11px 28px; background: transparent; border: 1px solid var(--border2); border-radius: 8px; color: var(--text-soft); font-size: 0.875rem; text-decoration: none; transition: all 0.2s; }
+.btn-back:hover { border-color: var(--gold); color: var(--gold); }
+
+@media (max-width: 900px) {
     .page-wrap { padding: 60px 24px; }
-    .contact-wrap { grid-template-columns: 1fr; }
-    .contact-grid { grid-template-columns: 1fr; }
+    .contact-layout { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
 }
 {% endblock %}
 
 {% block content %}
 <div class="page-wrap">
     <div class="page-hero">
-        <div class="page-label">Contact Us</div>
-        <h1 class="page-title">Get in <span class="gradient">touch</span></h1>
-        <p class="page-sub">Have a question or feedback? We'd love to hear from you.</p>
+        <div class="page-eyebrow">Get in Touch</div>
+        <h1 class="page-title">We'd love to<br><span class="highlight">hear from you</span></h1>
+        <p class="page-sub">Have a question, suggestion, or just want to say hello? Send us a message and we'll get back to you.</p>
     </div>
 
-    <div class="contact-wrap">
-        <div class="contact-info">
+    <div class="contact-layout">
+
+        <!-- INFO CARDS -->
+        <div class="info-stack">
             <div class="info-card">
                 <div class="info-icon">📧</div>
                 <div>
                     <div class="info-label">Email</div>
-                    <div class="info-value">hello@libraspace.com</div>
+                    <div class="info-value">support@libraspace.com</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">🕐</div>
+                <div>
+                    <div class="info-label">Response Time</div>
+                    <div class="info-value">Within 24 hours</div>
                 </div>
             </div>
             <div class="info-card">
@@ -109,48 +189,72 @@ input:focus, textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px
                 </div>
             </div>
             <div class="info-card">
-                <div class="info-icon">🕐</div>
-                <div>
-                    <div class="info-label">Support Hours</div>
-                    <div class="info-value">Mon–Fri, 9am–5pm</div>
-                </div>
-            </div>
-            <div class="info-card">
                 <div class="info-icon">💬</div>
                 <div>
-                    <div class="info-label">Response Time</div>
-                    <div class="info-value">Within 24 hours</div>
+                    <div class="info-label">Support Hours</div>
+                    <div class="info-value">Mon – Fri, 9am – 6pm</div>
                 </div>
             </div>
         </div>
 
-        <div class="contact-card">
-            <form>
-                <div class="contact-grid">
+        <!-- CONTACT FORM -->
+        <div class="form-card">
+            {% if sent %}
+            <div class="success-state">
+                <div class="success-ring">✓</div>
+                <div class="success-title">Message <span>Sent!</span></div>
+                <p class="success-sub">Thank you for reaching out. We'll get back to you within 24 hours.</p>
+                <a href="/contact" class="btn-back">Send Another Message</a>
+            </div>
+            {% else %}
+            <div class="form-card-title">Send a Message</div>
+            <div class="form-card-sub">Fill out the form below and we'll respond as soon as possible.</div>
+
+            <form method="POST">
+                <div class="form-row">
                     <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" placeholder="Juan">
+                        <label>Full Name</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">👤</span>
+                            <input type="text" name="name" placeholder="Your name" required>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" placeholder="Dela Cruz">
-                    </div>
-                    <div class="form-group contact-full">
                         <label>Email</label>
-                        <input type="email" placeholder="juan@email.com">
-                    </div>
-                    <div class="form-group contact-full">
-                        <label>Subject</label>
-                        <input type="text" placeholder="How can we help?">
-                    </div>
-                    <div class="form-group contact-full">
-                        <label>Message</label>
-                        <textarea rows="5" placeholder="Write your message here..."></textarea>
+                        <div class="input-wrap">
+                            <span class="input-icon">📧</span>
+                            <input type="email" name="email" placeholder="your@email.com" required>
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="btn-submit">Send Message →</button>
+
+                <div class="form-group">
+                    <label>Subject</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">📋</span>
+                        <select name="subject">
+                            <option value="General Inquiry">General Inquiry</option>
+                            <option value="Order Issue">Order Issue</option>
+                            <option value="Account Help">Account Help</option>
+                            <option value="Book Request">Book Request</option>
+                            <option value="Feedback">Feedback</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <div class="input-wrap">
+                        <span class="input-icon top">💬</span>
+                        <textarea name="message" placeholder="Write your message here..." required minlength="10"></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Send Message →</button>
             </form>
+            {% endif %}
         </div>
+
     </div>
 </div>
 {% endblock %}

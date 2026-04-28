@@ -9,77 +9,123 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #0a1628;
-            --surface: #0d1b35;
-            --surface2: #111f3e;
-            --border: #1a2d52;
-            --border2: #1f3660;
+            --bg: #070e1a;
+            --surface: #0c1628;
+            --surface2: #101e35;
+            --surface3: #152240;
+            --border: #182a48;
+            --border2: #1e3358;
             --gold: #c9a84c;
             --gold-light: #e8c96a;
+            --gold-dim: rgba(201,168,76,0.12);
             --text: #e8edf5;
-            --text-muted: #6b7a99;
-            --text-soft: #9aa3bc;
+            --text-muted: #5a6a88;
+            --text-soft: #8a96b4;
+            --green: #4ade80;
         }
+
+        html, body { height: 100%; }
 
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
 
+        /* grid bg */
         .grid-bg {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background-image:
-                linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
+                linear-gradient(rgba(201,168,76,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201,168,76,0.025) 1px, transparent 1px);
+            background-size: 56px 56px;
         }
+        .glow-orb {
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+            filter: blur(100px);
+        }
+        .glow-orb-1 { width: 500px; height: 500px; background: rgba(201,168,76,0.05); top: -150px; right: -100px; }
+        .glow-orb-2 { width: 400px; height: 400px; background: rgba(79,120,247,0.04); bottom: 0; left: -80px; }
 
         /* NAV */
         nav {
-            position: relative; z-index: 10;
+            position: sticky; top: 0; z-index: 100;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; height: 60px;
-            background: rgba(10,22,40,0.97);
+            padding: 0 32px; height: 62px;
+            background: rgba(7,14,26,0.97);
             border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
         }
-
         .nav-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.15rem; font-weight: 700;
+            font-size: 1.1rem; font-weight: 700;
             color: var(--text); text-decoration: none;
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 9px;
         }
-
         .nav-logo-icon {
-            width: 28px; height: 28px; background: var(--gold);
-            border-radius: 6px; display: flex; align-items: center;
-            justify-content: center; font-size: 0.8rem;
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; font-size: 0.9rem;
+            box-shadow: 0 0 18px rgba(201,168,76,0.25);
         }
-
         .nav-logo span { color: var(--gold); }
 
-        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .nav-center {
+            display: flex; align-items: center; gap: 4px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .nav-action {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 14px; border-radius: 9px;
+            font-size: 0.78rem; font-weight: 500; color: var(--text-soft);
+            text-decoration: none; transition: all 0.2s;
+            position: relative; white-space: nowrap;
+        }
+        .nav-action:hover { background: var(--surface3); color: var(--text); }
+        .nav-action-icon {
+            width: 26px; height: 26px; border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; flex-shrink: 0;
+        }
+        .nav-action-icon.orders { background: rgba(79,142,247,0.15); }
+        .nav-action-icon.cart   { background: rgba(201,168,76,0.15); }
+        .nav-action-icon.profile{ background: rgba(74,222,128,0.12); }
+        .nav-action-text { letter-spacing: 0.1px; }
+        .nav-badge {
+            min-width: 17px; height: 17px;
+            background: var(--gold); color: #070e1a;
+            font-size: 0.6rem; font-weight: 700;
+            border-radius: 100px; display: flex;
+            align-items: center; justify-content: center;
+            padding: 0 4px; margin-left: 2px;
+        }
 
+        .nav-right { display: flex; align-items: center; gap: 8px; }
         .nav-user {
             display: flex; align-items: center; gap: 8px;
             background: var(--surface2); border: 1px solid var(--border2);
-            border-radius: 6px; padding: 5px 12px;
-            font-size: 0.8rem; color: var(--text-soft);
+            border-radius: 8px; padding: 5px 12px;
+            font-size: 0.78rem; color: var(--text-soft);
         }
-
+        .nav-user-dot {
+            width: 7px; height: 7px; background: var(--green);
+            border-radius: 50%; flex-shrink: 0;
+            box-shadow: 0 0 6px var(--green);
+        }
         .nav-btn {
             padding: 6px 14px; background: transparent;
-            border: 1px solid var(--border2); border-radius: 6px;
-            color: var(--text-soft); font-size: 0.8rem;
+            border: 1px solid var(--border2); border-radius: 7px;
+            color: var(--text-soft); font-size: 0.78rem;
             font-family: 'Inter', sans-serif; cursor: pointer;
             text-decoration: none; transition: all 0.2s;
         }
-
         .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
 
         /* LAYOUT */
@@ -87,314 +133,333 @@
 
         /* SIDEBAR */
         .sidebar {
-            width: 220px; flex-shrink: 0;
+            width: 230px; flex-shrink: 0;
             background: var(--surface);
             border-right: 1px solid var(--border);
-            padding: 24px 14px;
-            display: flex; flex-direction: column; gap: 4px;
-            position: sticky; top: 0; height: calc(100vh - 60px);
-            overflow-y: auto;
+            position: fixed; top: 62px; left: 0;
+            height: calc(100vh - 62px);
+            overflow-y: auto; z-index: 50;
+            scrollbar-width: none;
+            display: flex; flex-direction: column;
         }
+        .sidebar::-webkit-scrollbar { display: none; }
 
-        .sidebar-label {
-            font-size: 0.65rem; font-weight: 600;
-            color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: 1px; padding: 0 10px;
-            margin-bottom: 6px; margin-top: 14px;
+        .sidebar-user {
+            padding: 20px 16px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
         }
+        .sidebar-avatar {
+            width: 38px; height: 38px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--gold-dim), rgba(201,168,76,0.25));
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .sidebar-user-info { overflow: hidden; }
+        .sidebar-username {
+            font-size: 0.82rem; font-weight: 600; color: var(--text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .sidebar-role {
+            font-size: 0.68rem; color: var(--text-muted);
+            display: flex; align-items: center; gap: 4px; margin-top: 2px;
+        }
+        .sidebar-role-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; }
 
-        .sidebar-label:first-child { margin-top: 0; }
+        .sidebar-nav { padding: 12px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+
+        .sidebar-section {
+            font-size: 0.62rem; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1.2px;
+            padding: 10px 8px 6px;
+        }
+        .sidebar-section:first-child { padding-top: 2px; }
 
         .sidebar-link {
             display: flex; align-items: center; gap: 10px;
-            padding: 8px 10px; border-radius: 7px;
-            font-size: 0.83rem; color: var(--text-soft);
-            text-decoration: none; transition: all 0.2s;
-            font-weight: 500;
+            padding: 8px 10px; border-radius: 8px;
+            font-size: 0.82rem; color: var(--text-soft);
+            text-decoration: none; transition: all 0.18s; font-weight: 500;
+            position: relative;
+        }
+        .sidebar-link:hover { background: var(--surface2); color: var(--text); }
+        .sidebar-link.active {
+            background: var(--gold-dim);
+            color: var(--gold);
+            border: 1px solid rgba(201,168,76,0.18);
+        }
+        .sidebar-link.active::before {
+            content: '';
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 3px; height: 60%; background: var(--gold);
+            border-radius: 0 3px 3px 0;
+        }
+        .sidebar-icon { font-size: 0.95rem; width: 20px; text-align: center; flex-shrink: 0; }
+        .sidebar-link-text { flex: 1; }
+
+        .cart-badge {
+            min-width: 18px; height: 18px;
+            background: var(--gold); color: #070e1a;
+            font-size: 0.62rem; font-weight: 700;
+            border-radius: 100px; display: flex;
+            align-items: center; justify-content: center;
+            padding: 0 5px;
         }
 
-        .sidebar-link:hover { background: var(--surface2); color: var(--text); }
-        .sidebar-link.active { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
-
-        .sidebar-icon { font-size: 1rem; width: 20px; text-align: center; }
-
-        .genre-section { margin-top: 4px; }
+        .sidebar-divider {
+            height: 1px; background: var(--border);
+            margin: 6px 10px;
+        }
 
         .genre-pill {
-            display: block; padding: 6px 10px;
-            border-radius: 6px; font-size: 0.8rem;
-            color: var(--text-muted); text-decoration: none;
-            transition: all 0.2s; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis;
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 10px; border-radius: 7px;
+            font-size: 0.8rem; color: var(--text-muted);
+            text-decoration: none; transition: all 0.18s;
         }
-
+        .genre-pill::before {
+            content: ''; width: 5px; height: 5px;
+            border-radius: 50%; background: var(--border2);
+            flex-shrink: 0; transition: background 0.18s;
+        }
         .genre-pill:hover { background: var(--surface2); color: var(--text); }
+        .genre-pill:hover::before { background: var(--text-soft); }
         .genre-pill.active { color: var(--gold); font-weight: 600; }
+        .genre-pill.active::before { background: var(--gold); }
 
-        /* MAIN CONTENT */
+        /* MAIN */
         main {
-            flex: 1; padding: 28px 36px;
-            max-width: 100%; overflow-x: hidden;
+            flex: 1; margin-left: 230px;
+            padding: 28px 32px;
+            overflow-x: hidden;
+            min-height: calc(100vh - 62px);
         }
 
-        /* HERO BANNER */
-        .hero-banner {
-            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 60%, var(--surface3) 100%);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 26px 30px;
-            margin-bottom: 28px;
+            border-radius: 14px; padding: 28px 32px;
+            margin-bottom: 24px;
             display: flex; justify-content: space-between; align-items: center;
             position: relative; overflow: hidden;
         }
-
-        .hero-banner::before {
+        .hero::before {
             content: '';
-            position: absolute; top: -40px; right: -40px;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, transparent 60%, rgba(201,168,76,0.04) 100%);
         }
-
-        .hero-text { position: relative; z-index: 1; }
-
-        .hero-greeting {
+        .hero::after {
+            content: '';
+            position: absolute; top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+        }
+        .hero-left { position: relative; z-index: 1; }
+        .hero-eyebrow {
+            font-size: 0.7rem; font-weight: 600; color: var(--gold);
+            text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+        }
+        .hero-eyebrow::before {
+            content: ''; width: 16px; height: 1px; background: var(--gold);
+        }
+        .hero-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.4rem; font-weight: 700; color: var(--text);
-            margin-bottom: 5px;
+            font-size: 1.55rem; font-weight: 700; color: var(--text);
+            margin-bottom: 6px; line-height: 1.3;
         }
-
-        .hero-greeting span { color: var(--gold); }
-        .hero-sub { font-size: 0.85rem; color: var(--text-muted); }
-
-        .hero-decoration {
-            font-size: 3.5rem; opacity: 0.15;
-            position: relative; z-index: 1;
-        }
-
-        /* SEARCH + TOOLBAR */
-        .toolbar {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 24px; flex-wrap: wrap;
-        }
-
-        .search-wrap { flex: 1; max-width: 480px; display: flex; gap: 0; }
-
-        .search-input {
-            flex: 1; padding: 9px 16px;
-            background: var(--surface); border: 1px solid var(--border2);
-            border-radius: 7px 0 0 7px; color: var(--text);
-            font-size: 0.85rem; font-family: 'Inter', sans-serif; outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .search-input::placeholder { color: var(--text-muted); }
-        .search-input:focus { border-color: var(--gold); }
-
-        .search-btn {
-            padding: 9px 18px; background: var(--gold);
-            border: none; border-radius: 0 7px 7px 0;
-            color: #0a1628; font-size: 0.83rem; font-weight: 700;
-            font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s;
-        }
-
-        .search-btn:hover { background: var(--gold-light); }
-
-        .results-info {
-            font-size: 0.8rem; color: var(--text-muted);
-            padding: 5px 12px; background: var(--surface);
-            border: 1px solid var(--border); border-radius: 100px;
-            white-space: nowrap;
-        }
-
-        /* SECTION HEADER */
-        .section-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.05rem; font-weight: 700; color: var(--text);
-        }
-
-        /* BOOKS GRID */
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .book-card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 10px; overflow: hidden;
-            display: flex; flex-direction: column;
-            transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-        }
-
-        .book-card:hover {
-            border-color: var(--gold);
-            transform: translateY(-5px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5);
-        }
-
-        .book-cover-wrap { position: relative; width: 100%; height: 210px; overflow: hidden; }
-
-        .book-cover-img {
-            width: 100%; height: 100%;
-            object-fit: cover; display: block;
-            transition: transform 0.35s;
-        }
-
-        .book-card:hover .book-cover-img { transform: scale(1.06); }
-
-        .book-cover-placeholder {
-            width: 100%; height: 100%;
-            background: var(--surface2);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3.5rem;
-        }
-
-        .book-genre-badge {
-            position: absolute; top: 10px; left: 10px;
-            font-size: 0.65rem; font-weight: 700;
-            background: rgba(10,22,40,0.88);
-            border: 1px solid rgba(201,168,76,0.35);
-            color: var(--gold); padding: 3px 10px;
-            border-radius: 100px; backdrop-filter: blur(8px);
-            text-transform: uppercase; letter-spacing: 0.6px;
-        }
-
-        .book-body { padding: 14px 16px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
-        .book-title { font-size: 0.88rem; font-weight: 600; color: var(--text); line-height: 1.4; }
-        .book-author { font-size: 0.76rem; color: var(--text-muted); }
-
-        .book-footer {
-            padding: 10px 16px;
-            border-top: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-
-        .avail-badge {
-            display: flex; align-items: center; gap: 5px;
-            font-size: 0.72rem; color: #4ade80;
-        }
-
-        .avail-dot { width: 5px; height: 5px; background: #4ade80; border-radius: 50%; }
-
-        .view-btn {
-            padding: 5px 14px; background: var(--gold);
-            border-radius: 5px; color: #0a1628;
-            font-size: 0.76rem; font-weight: 700;
-            text-decoration: none; transition: all 0.2s;
-        }
-
-        .view-btn:hover { background: var(--gold-light); }
-
-        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
-        .empty-icon { font-size: 3rem; margin-bottom: 16px; }
-        .empty-state p { font-size: 0.95rem; }
-
-        /* FOOTER */
-        footer {
-            position: relative; z-index: 1;
-            background: var(--surface); border-top: 1px solid var(--border);
-            padding: 18px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .footer-logo { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--gold); }
-        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
-        .footer-links { display: flex; gap: 20px; }
-        .footer-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-        .footer-links a:hover { color: var(--gold); }
-
-        /* ANIMATIONS */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeInLeft {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-6px); }
-        }
-
-        @keyframes glow-border {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
-            50% { box-shadow: 0 0 16px 2px rgba(201,168,76,0.15); }
-        }
-
-        .sidebar { animation: fadeInLeft 0.4s ease both; }
-
-        .hero-banner { animation: fadeInUp 0.4s ease both; }
-
-        .toolbar { animation: fadeInUp 0.5s ease both; }
-
-        .section-header { animation: fadeInUp 0.55s ease both; }
-
-        .book-card {
-            animation: fadeInUp 0.4s ease both;
-            animation-fill-mode: both;
-        }
-
-        .book-card:nth-child(1) { animation-delay: 0.05s; }
-        .book-card:nth-child(2) { animation-delay: 0.1s; }
-        .book-card:nth-child(3) { animation-delay: 0.15s; }
-        .book-card:nth-child(4) { animation-delay: 0.2s; }
-        .book-card:nth-child(5) { animation-delay: 0.25s; }
-        .book-card:nth-child(6) { animation-delay: 0.3s; }
-        .book-card:nth-child(7) { animation-delay: 0.35s; }
-        .book-card:nth-child(8) { animation-delay: 0.4s; }
-        .book-card:nth-child(n+9) { animation-delay: 0.45s; }
-
-        .hero-decoration { animation: float 4s ease-in-out infinite; }
-
-        .avail-dot { animation: pulse-dot 2s ease-in-out infinite; }
-
-        .nav-logo-icon { animation: glow-border 3s ease-in-out infinite; }
-
-        .hero-greeting span {
+        .hero-title span {
             background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: shimmer 3s linear infinite;
         }
+        @keyframes shimmer { 0%{background-position:0% center} 100%{background-position:200% center} }
+        .hero-sub { font-size: 0.83rem; color: var(--text-muted); }
+        .hero-deco {
+            font-size: 4rem; opacity: 0.08;
+            position: relative; z-index: 1;
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 
-        .sidebar-link, .genre-pill {
-            transition: all 0.2s ease;
+        /* STATS */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 14px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px 18px;
+            display: flex; align-items: center; gap: 14px;
+            transition: border-color 0.2s;
+        }
+        .stat-card:hover { border-color: var(--border2); }
+        .stat-icon {
+            width: 38px; height: 38px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; flex-shrink: 0;
+        }
+        .stat-icon.gold { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); }
+        .stat-icon.blue { background: rgba(79,142,247,0.1); border: 1px solid rgba(79,142,247,0.2); }
+        .stat-icon.green { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); }
+        .stat-value { font-size: 1.3rem; font-weight: 700; color: var(--text); line-height: 1; }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+
+        /* TOOLBAR */
+        .toolbar {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .search-wrap { flex: 1; min-width: 200px; display: flex; }
+        .search-input {
+            flex: 1; padding: 9px 16px;
+            background: var(--surface); border: 1px solid var(--border2);
+            border-right: none;
+            border-radius: 8px 0 0 8px; color: var(--text);
+            font-size: 0.84rem; font-family: 'Inter', sans-serif; outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-input:focus { border-color: var(--gold); }
+        .search-btn {
+            padding: 9px 18px; background: var(--gold);
+            border: none; border-radius: 0 8px 8px 0;
+            color: #070e1a; font-size: 0.82rem; font-weight: 700;
+            font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .search-btn:hover { background: var(--gold-light); }
+
+        /* SECTION HEADER */
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem; font-weight: 700; color: var(--text);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title::after {
+            content: ''; width: 30px; height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+            border-radius: 2px;
+        }
+        .section-count {
+            font-size: 0.75rem; color: var(--text-muted);
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 100px; padding: 3px 10px;
         }
 
-        .search-input, .search-btn {
-            transition: all 0.2s ease;
+        /* BOOKS GRID */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+            gap: 18px;
         }
+        .book-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: all 0.25s; cursor: pointer;
+        }
+        .book-card:hover {
+            border-color: rgba(201,168,76,0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.1);
+        }
+        .book-cover-wrap { position: relative; width: 100%; height: 200px; overflow: hidden; }
+        .book-cover-img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+            transition: transform 0.35s;
+        }
+        .book-card:hover .book-cover-img { transform: scale(1.07); }
+        .book-cover-placeholder {
+            width: 100%; height: 100%; background: var(--surface2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem;
+        }
+        .book-genre-badge {
+            position: absolute; top: 8px; left: 8px;
+            font-size: 0.6rem; font-weight: 700;
+            background: rgba(7,14,26,0.85);
+            border: 1px solid rgba(201,168,76,0.3);
+            color: var(--gold); padding: 3px 9px;
+            border-radius: 100px; backdrop-filter: blur(8px);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .book-price-badge {
+            position: absolute; bottom: 8px; right: 8px;
+            font-size: 0.72rem; font-weight: 700;
+            background: rgba(7,14,26,0.88);
+            border: 1px solid rgba(201,168,76,0.25);
+            color: var(--gold-light); padding: 3px 9px;
+            border-radius: 100px; backdrop-filter: blur(8px);
+        }
+        .book-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .book-title { font-size: 0.85rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+        .book-author { font-size: 0.73rem; color: var(--text-muted); }
+        .book-footer {
+            padding: 9px 14px;
+            border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .avail-badge { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--green); }
+        .avail-dot {
+            width: 5px; height: 5px; background: var(--green); border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.4} }
+        .view-btn {
+            padding: 5px 13px; background: var(--gold);
+            border-radius: 6px; color: #070e1a;
+            font-size: 0.73rem; font-weight: 700;
+            text-decoration: none; transition: all 0.2s;
+        }
+        .view-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+        /* EMPTY */
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+        .empty-icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.5; }
+        .empty-state p { font-size: 0.9rem; }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; margin-top: 32px; flex-wrap: wrap;
+        }
+        .page-btn {
+            padding: 7px 14px; border-radius: 7px;
+            font-size: 0.8rem; font-weight: 600;
+            text-decoration: none; transition: all 0.2s;
+            background: var(--surface); border: 1px solid var(--border2);
+            color: var(--text-soft);
+        }
+        .page-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .page-btn.active { background: var(--gold); color: #070e1a; border-color: var(--gold); }
 
         @media (max-width: 900px) {
             .sidebar { display: none; }
-            main { padding: 24px 20px; }
-            .hero-banner { padding: 24px; }
-            footer { flex-direction: column; gap: 10px; text-align: center; }
+            main { margin-left: 0; padding: 20px 16px; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 560px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .hero-deco { display: none; }
         }
     </style>
 </head>
 <body>
 
     <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
 
     <nav>
         <a href="/dashboard" class="nav-logo">
@@ -402,73 +467,136 @@
             Libra<span>Space</span>
         </a>
         <div class="nav-right">
-            <div class="nav-user">👤 {{ username }}</div>
+            <div class="nav-user">
+                <div class="nav-user-dot"></div>
+                {{ username }}
+            </div>
             <a href="/logout" class="nav-btn">Sign out</a>
         </div>
     </nav>
 
     <div class="layout">
 
-        <!-- SIDEBAR -->
         <aside class="sidebar">
-            <div class="sidebar-label">Browse</div>
-            <a href="/dashboard" class="sidebar-link active">
-                <span class="sidebar-icon">📚</span> All Books
-            </a>
-            <a href="/reservations" class="sidebar-link">
-                <span class="sidebar-icon">🔖</span> My Reservations
-            </a>
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">👤</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-username">{{ username }}</div>
+                    <div class="sidebar-role">
+                        <div class="sidebar-role-dot"></div>
+                        Active Member
+                    </div>
+                </div>
+            </div>
 
-            <div class="sidebar-label">Genres</div>
-            <div class="genre-section">
-                <a href="/dashboard" class="genre-pill {{ 'active' if not selected_genre }}">All</a>
+            <div class="sidebar-nav">
+                <div class="sidebar-section">Browse</div>
+                <a href="/dashboard" class="sidebar-link active">
+                    <span class="sidebar-icon">📚</span>
+                    <span class="sidebar-link-text">All Books</span>
+                </a>
+                <a href="/orders" class="sidebar-link">
+                    <span class="sidebar-icon">📦</span>
+                    <span class="sidebar-link-text">My Orders</span>
+                </a>
+
+                <div class="sidebar-section">Cart</div>
+                <a href="/cart" class="sidebar-link">
+                    <span class="sidebar-icon">🛒</span>
+                    <span class="sidebar-link-text">My Cart</span>
+                    {% if cart_count > 0 %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
+                </a>
+
+                <div class="sidebar-section">Account</div>
+                <a href="/profile" class="sidebar-link">
+                    <span class="sidebar-icon">👤</span>
+                    <span class="sidebar-link-text">My Profile</span>
+                </a>
+
+                {% if genres %}
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-section">Genres</div>
+                <a href="/dashboard" class="genre-pill {{ 'active' if not selected_genre }}">All Genres</a>
                 {% for genre in genres %}
                 <a href="/dashboard?genre={{ genre }}" class="genre-pill {{ 'active' if selected_genre == genre }}">{{ genre }}</a>
                 {% endfor %}
+                {% endif %}
             </div>
         </aside>
 
-        <!-- MAIN -->
         <main>
-            <div class="hero-banner">
-                <div class="hero-text">
-                    <div class="hero-greeting">Good day, <span>{{ username }}</span> 👋</div>
-                    <div class="hero-sub">Discover and reserve books from our collection.</div>
+            <!-- HERO -->
+            <div class="hero">
+                <div class="hero-left">
+                    <div class="hero-eyebrow">Welcome back</div>
+                    <div class="hero-title">Hello, <span>{{ username }}</span> 👋</div>
+                    <div class="hero-sub">Discover your next great read from our curated collection.</div>
                 </div>
-                <div class="hero-decoration">📚</div>
+                <div class="hero-deco">📚</div>
             </div>
 
+            <!-- STATS -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon gold">📚</div>
+                    <div>
+                        <div class="stat-value">{{ total }}</div>
+                        <div class="stat-label">Books Available</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">🛒</div>
+                    <div>
+                        <div class="stat-value">{{ cart_count }}</div>
+                        <div class="stat-label">Items in Cart</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div>
+                        <div class="stat-value">{{ genres|length if genres else 0 }}</div>
+                        <div class="stat-label">Genres</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOOLBAR -->
             <div class="toolbar">
                 <form class="search-wrap" method="GET" action="/dashboard">
                     {% if selected_genre %}<input type="hidden" name="genre" value="{{ selected_genre }}">{% endif %}
-                    <input class="search-input" type="text" name="search" placeholder="Search books by title..." value="{{ search_query or '' }}">
-                    <button class="search-btn" type="submit">Search</button>
+                    <input class="search-input" type="text" name="search" placeholder="Search by title, author, or description..." value="{{ search_query or '' }}">
+                    <button class="search-btn" type="submit">🔍 Search</button>
                 </form>
-                <div class="results-info">{{ books | length }} book{{ 's' if books | length != 1 }} found</div>
             </div>
 
+            <!-- SECTION HEADER -->
             <div class="section-header">
                 <div class="section-title">{{ selected_genre if selected_genre else 'All Books' }}</div>
+                <div class="section-count">{{ total }} book{{ 's' if total != 1 }}</div>
             </div>
 
+            <!-- BOOKS -->
             {% if books %}
             <div class="books-grid">
                 {% for book in books %}
                 <div class="book-card">
-                    <div class="book-cover-wrap">
-                        {% set book_image = book.image_url or book.cover_url %}
-                        {% if book_image %}
-                        <img src="{{ book_image }}" alt="{{ book.title }}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                        <div class="book-cover-placeholder" style="display:none">📖</div>
-                        {% else %}
-                        <div class="book-cover-placeholder">📖</div>
-                        {% endif %}
-                        <div class="book-genre-badge">{{ book.genre if book.genre else 'General' }}</div>
-                    </div>
-                    <div class="book-body">
-                        <div class="book-title">{{ book.title }}</div>
-                        {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
-                    </div>
+                    <a href="/book/{{ book.id }}" style="text-decoration:none;display:block;">
+                        <div class="book-cover-wrap">
+                            {% set book_image = book.image_url or book.cover_url %}
+                            {% if book_image %}
+                            <img src="{{ book_image }}" alt="{{ book.title }}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                            <div class="book-cover-placeholder" style="display:none">📖</div>
+                            {% else %}
+                            <div class="book-cover-placeholder">📖</div>
+                            {% endif %}
+                            <div class="book-genre-badge">{{ book.genre if book.genre else 'General' }}</div>
+                            {% set price = book.get('price') %}{% if price is not none %}<div class="book-price-badge">₱{{ "%.2f"|format(price|float) }}</div>{% endif %}
+                        </div>
+                        <div class="book-body">
+                            <div class="book-title">{{ book.title }}</div>
+                            {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
+                        </div>
+                    </a>
                     <div class="book-footer">
                         <div class="avail-badge"><div class="avail-dot"></div> Available</div>
                         <a href="/book/{{ book.id }}" class="view-btn">View →</a>
@@ -482,19 +610,24 @@
                 <p>No books found.</p>
             </div>
             {% endif %}
+
+            <!-- PAGINATION -->
+            {% if total_pages > 1 %}
+            <div class="pagination">
+                {% if page > 1 %}
+                <a href="/dashboard?page={{ page - 1 }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn">← Prev</a>
+                {% endif %}
+                {% for p in range(1, total_pages + 1) %}
+                <a href="/dashboard?page={{ p }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn {{ 'active' if p == page }}">{{ p }}</a>
+                {% endfor %}
+                {% if page < total_pages %}
+                <a href="/dashboard?page={{ page + 1 }}{% if selected_genre %}&genre={{ selected_genre }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="page-btn">Next →</a>
+                {% endif %}
+            </div>
+            {% endif %}
+
         </main>
-
     </div>
-
-    <footer>
-        <div class="footer-logo">📚 LibraSpace</div>
-        <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
-        <div class="footer-links">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="/about">About</a>
-        </div>
-    </footer>
 
 </body>
 </html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — Verify Email</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a1628; --surface: #0d1b35; --border: #1a2d52;
+            --border2: #1f3660; --gold: #c9a84c; --gold-light: #e8c96a;
+            --text: #e8edf5; --text-muted: #6b7a99; --text-soft: #9aa3bc;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .card {
+            background: var(--surface); border: 1px solid var(--border2);
+            border-radius: 14px; padding: 40px 36px; width: 100%; max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 8px; }
+        .logo span { color: var(--gold); }
+        .subtitle { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-bottom: 28px; }
+        label { display: block; font-size: 0.8rem; color: var(--text-soft); margin-bottom: 6px; }
+        input {
+            width: 100%; padding: 11px 14px; background: #0a1628;
+            border: 1px solid var(--border2); border-radius: 7px;
+            color: var(--text); font-size: 1.1rem; letter-spacing: 6px;
+            text-align: center; font-family: 'Inter', sans-serif;
+            margin-bottom: 16px; outline: none; transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--gold); }
+        .error { font-size: 0.8rem; color: #f87171; margin-bottom: 14px; text-align: center; }
+        .btn {
+            width: 100%; padding: 12px; background: var(--gold);
+            border: none; border-radius: 7px; color: #0a1628;
+            font-size: 0.9rem; font-weight: 700; font-family: 'Inter', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn:hover { background: var(--gold-light); }
+        .resend { text-align: center; margin-top: 16px; font-size: 0.8rem; color: var(--text-muted); }
+        .resend button {
+            background: none; border: none; color: var(--gold);
+            cursor: pointer; font-size: 0.8rem; font-family: 'Inter', sans-serif;
+        }
+        .resend button:disabled { color: var(--text-muted); cursor: not-allowed; }
+        .resend button:not(:disabled):hover { text-decoration: underline; }
+        #resendMsg { font-size: 0.78rem; color: #4ade80; margin-top: 8px; display: none; text-align: center; }
+        #countdown { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">📚 Libra<span>Space</span></div>
+        <div class="subtitle">Enter the 6-digit code sent to your email.</div>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <label>Verification Code</label>
+            <input type="text" name="otp" maxlength="6" placeholder="000000" autofocus required>
+            <button type="submit" class="btn">Verify</button>
+        </form>
+
+        <div class="resend">
+            Didn't receive it?
+            <button onclick="resendOtp()">Resend code</button>
+        </div>
+        <div id="resendMsg">✅ A new code has been sent!</div>
+    </div>
+
+    <script>
+        const btn = document.querySelector('.resend button');
+        const countdownEl = document.createElement('div');
+        countdownEl.id = 'countdown';
+        document.querySelector('.resend').after(countdownEl);
+
+        let timer = null;
+
+        function startCountdown() {
+            let secs = 60;
+            btn.disabled = true;
+            countdownEl.textContent = `Resend available in ${secs}s`;
+            timer = setInterval(() => {
+                secs--;
+                if (secs <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    countdownEl.textContent = '';
+                } else {
+                    countdownEl.textContent = `Resend available in ${secs}s`;
+                }
+            }, 1000);
+        }
+
+        function resendOtp() {
+            const email = '{{ session.get("otp_email", "") }}';
+            fetch('/send-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            }).then(r => r.json()).then(d => {
+                const msg = document.getElementById('resendMsg');
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 4000);
+                startCountdown();
+            });
+        }
+
+        // start countdown on page load (OTP just sent)
+        startCountdown();
+    </script>
+</body>
+</html>

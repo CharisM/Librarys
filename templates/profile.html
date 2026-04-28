@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — My Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a1628; --surface: #0d1b35; --surface2: #111f3e;
+            --border: #1a2d52; --border2: #1f3660;
+            --gold: #c9a84c; --gold-light: #e8c96a;
+            --text: #e8edf5; --text-muted: #6b7a99; --text-soft: #9aa3bc;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+        .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+
+        nav { position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 60px; background: rgba(10,22,40,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px); }
+        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-logo-icon { width: 28px; height: 28px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .nav-logo span { color: var(--gold); }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .nav-user { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 5px 12px; font-size: 0.8rem; color: var(--text-soft); }
+        .nav-btn { padding: 6px 14px; background: transparent; border: 1px solid var(--border2); border-radius: 6px; color: var(--text-soft); font-size: 0.8rem; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        .layout { display: flex; flex: 1; position: relative; z-index: 1; }
+
+        .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 14px; display: flex; flex-direction: column; gap: 4px; position: fixed; top: 60px; left: 0; height: calc(100vh - 60px); overflow-y: auto; z-index: 5; }
+        .sidebar-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 0 10px; margin-bottom: 6px; margin-top: 14px; }
+        .sidebar-label:first-child { margin-top: 0; }
+        .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; font-size: 0.83rem; color: var(--text-soft); text-decoration: none; transition: all 0.2s; font-weight: 500; }
+        .sidebar-link:hover { background: var(--surface2); color: var(--text); }
+        .sidebar-link.active { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+        .sidebar-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+        main { flex: 1; padding: 36px 40px; position: relative; z-index: 1; max-width: 860px; margin-left: 220px; }
+
+        /* PROFILE HEADER */
+        .profile-header {
+            display: flex; align-items: center; gap: 24px;
+            background: linear-gradient(135deg, var(--surface), var(--surface2));
+            border: 1px solid var(--border); border-radius: 14px;
+            padding: 28px 32px; margin-bottom: 32px;
+            position: relative; overflow: hidden;
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .profile-header::before {
+            content: ''; position: absolute; top: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+        }
+
+        .avatar {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; font-weight: 700; color: #0a1628;
+            flex-shrink: 0; position: relative; z-index: 1;
+            box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+        }
+
+        .profile-info { position: relative; z-index: 1; }
+        .profile-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+        .profile-meta { font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 16px; }
+        .profile-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); border-radius: 100px; padding: 3px 10px; font-size: 0.72rem; color: var(--gold); font-weight: 600; }
+
+        /* CARDS GRID */
+        .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        .profile-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 28px;
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .profile-card:nth-child(2) { animation-delay: 0.1s; }
+
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+        .card-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        .card-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+        .card-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+        .form-group { margin-bottom: 18px; }
+
+        label { display: block; font-size: 0.72rem; font-weight: 600; color: var(--text-soft); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.8px; }
+
+        .input-wrap { position: relative; }
+        .input-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; opacity: 0.35; pointer-events: none; }
+
+        input {
+            width: 100%; padding: 10px 14px 10px 38px;
+            background: var(--surface2); border: 1px solid var(--border2);
+            border-radius: 8px; color: var(--text);
+            font-size: 0.875rem; font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+        }
+
+        input::placeholder { color: var(--text-muted); }
+        input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1); }
+        input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .current-val { font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; }
+        .current-val span { color: var(--text-soft); font-weight: 500; }
+
+        .strength-bar { display: flex; gap: 4px; margin-top: 7px; }
+        .strength-seg { flex: 1; height: 3px; border-radius: 100px; background: var(--border2); transition: background 0.3s; }
+        .strength-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+
+        .btn-save {
+            width: 100%; padding: 11px;
+            background: var(--gold); border: none; border-radius: 8px;
+            color: #0a1628; font-size: 0.875rem; font-weight: 700;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            transition: all 0.2s; margin-top: 4px;
+        }
+
+        .btn-save:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,168,76,0.3); }
+
+        .alert { border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.82rem; }
+        .alert-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+        .alert-success { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.25); color: #bbf7d0; }
+
+        /* DANGER ZONE */
+        .danger-card {
+            background: var(--surface); border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 12px; padding: 24px 28px;
+            margin-top: 20px; display: flex;
+            align-items: center; justify-content: space-between;
+            animation: fadeInUp 0.4s ease 0.2s both;
+        }
+
+        .danger-info h4 { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .danger-info p { font-size: 0.8rem; color: var(--text-muted); }
+
+        .btn-danger {
+            padding: 9px 20px; background: transparent;
+            border: 1px solid rgba(239,68,68,0.4); border-radius: 7px;
+            color: #f87171; font-size: 0.82rem; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            text-decoration: none; transition: all 0.2s; white-space: nowrap;
+        }
+
+        .btn-danger:hover { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.6); }
+
+        /* FOOTER */
+        footer { position: relative; z-index: 1; margin-top: 40px; background: var(--surface); border-top: 1px solid var(--border); padding: 48px 40px 28px; }
+        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 30px; }
+        .footer-brand { max-width: 260px; }
+        .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .footer-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
+        .footer-col h4 { font-size: 0.75rem; font-weight: 600; color: var(--text-soft); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .footer-col ul a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-col ul a:hover { color: var(--gold); }
+        .footer-bottom { border-top: 1px solid var(--border); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-bottom-links { display: flex; gap: 20px; }
+        .footer-bottom-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-bottom-links a:hover { color: var(--gold); }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            main { padding: 24px 20px; margin-left: 0; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .danger-card { flex-direction: column; gap: 16px; align-items: flex-start; }
+            footer { padding: 36px 24px 20px; }
+            .footer-top { flex-direction: column; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <nav>
+        <a href="/dashboard" class="nav-logo">
+            <div class="nav-logo-icon">📚</div>
+            Libra<span>Space</span>
+        </a>
+        <div class="nav-right">
+            <div class="nav-user">👤 {{ username }}</div>
+            <a href="/logout" class="nav-btn">Sign out</a>
+        </div>
+    </nav>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+            <div class="sidebar-label">Browse</div>
+            <a href="/dashboard" class="sidebar-link">
+                <span class="sidebar-icon">📚</span> All Books
+            </a>
+            <a href="/cart" class="sidebar-link">
+                <span class="sidebar-icon">🛒</span> Cart
+            </a>
+            <a href="/orders" class="sidebar-link">
+                <span class="sidebar-icon">📦</span> My Orders
+            </a>
+            <div class="sidebar-label">Account</div>
+            <a href="/profile" class="sidebar-link active">
+                <span class="sidebar-icon">👤</span> My Profile
+            </a>
+        </aside>
+
+        <main>
+
+            <!-- PROFILE HEADER -->
+            <div class="profile-header">
+                <div class="avatar">{{ username[0].upper() }}</div>
+                <div class="profile-info">
+                    <div class="profile-name">{{ username }}</div>
+                    <div class="profile-meta">
+                        <div class="profile-badge">✦ Member</div>
+                        <span>{{ orders_count }} order{{ 's' if orders_count != 1 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EDIT CARDS -->
+            <div class="cards-grid">
+
+                <!-- CHANGE USERNAME -->
+                <div class="profile-card">
+                    <div class="card-header">
+                        <div class="card-icon">✏️</div>
+                        <div>
+                            <div class="card-title">Change Username</div>
+                            <div class="card-sub">Update your display name</div>
+                        </div>
+                    </div>
+
+                    {% if username_error %}
+                    <div class="alert alert-error">{{ username_error }}</div>
+                    {% endif %}
+                    {% if username_success %}
+                    <div class="alert alert-success">{{ username_success }}</div>
+                    {% endif %}
+
+                    <form method="POST" action="/profile/username">
+                        <div class="form-group">
+                            <label>Current Username</label>
+                            <div class="input-wrap">
+                                <span class="input-icon">👤</span>
+                                <input type="text" value="{{ username }}" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>New Username</label>
+                            <div class="input-wrap">
+                                <span class="input-icon">✏️</span>
+                                <input type="text" name="new_username" placeholder="Enter new username" required minlength="3">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save">Save Username →</button>
+                    </form>
+                </div>
+
+                <!-- CHANGE PASSWORD -->
+                <div class="profile-card">
+                    <div class="card-header">
+                        <div class="card-icon">🔐</div>
+                        <div>
+                            <div class="card-title">Change Password</div>
+                            <div class="card-sub">Keep your account secure</div>
+                        </div>
+                    </div>
+
+                    {% if password_error %}
+                    <div class="alert alert-error">{{ password_error }}</div>
+                    {% endif %}
+                    {% if password_success %}
+                    <div class="alert alert-success">{{ password_success }}</div>
+                    {% endif %}
+
+                    <form method="POST" action="/profile/password">
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <div class="input-wrap">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" name="current_password" placeholder="Enter current password" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <div class="input-wrap">
+                                <span class="input-icon">🔑</span>
+                                <input type="password" name="new_password" placeholder="Enter new password" required minlength="6" oninput="checkStrength(this.value)">
+                            </div>
+                            <div class="strength-bar">
+                                <div class="strength-seg" id="seg1"></div>
+                                <div class="strength-seg" id="seg2"></div>
+                                <div class="strength-seg" id="seg3"></div>
+                                <div class="strength-seg" id="seg4"></div>
+                            </div>
+                            <div class="strength-label" id="strength-label">Enter a password</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <div class="input-wrap">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" name="confirm_password" placeholder="Confirm new password" required minlength="6">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save">Save Password →</button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- CONTACT INFO -->
+            <div class="profile-card" style="margin-top:20px;grid-column:span 2;">
+                <div class="card-header">
+                    <div class="card-icon">📬</div>
+                    <div>
+                        <div class="card-title">Contact Information</div>
+                        <div class="card-sub">Update your email and phone number</div>
+                    </div>
+                </div>
+
+                {% if contact_error %}
+                <div class="alert alert-error">{{ contact_error }}</div>
+                {% endif %}
+                {% if contact_success %}
+                <div class="alert alert-success">{{ contact_success }}</div>
+                {% endif %}
+
+                <form method="POST" action="/profile/contact" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Email Address</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">📧</span>
+                            <input type="email" name="email" value="{{ email }}" placeholder="Enter email" required>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Phone Number</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">📞</span>
+                            <input type="tel" name="phone" value="{{ phone }}" placeholder="Enter phone number" required>
+                        </div>
+                    </div>
+                    <div style="grid-column:span 2;">
+                        <button type="submit" class="btn-save">Save Contact Info →</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- DANGER ZONE -->
+            <div class="danger-card">
+                <div class="danger-info">
+                    <h4>Sign out of your account</h4>
+                    <p>You will be redirected to the home page.</p>
+                </div>
+                <a href="/logout" class="btn-danger">Sign Out</a>
+            </div>
+
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-logo">📚 LibraSpace</div>
+                <div class="footer-desc">A modern online book store built to make buying books more accessible and enjoyable for everyone.</div>
+            </div>
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="/dashboard">All Books</a></li>
+                    <li><a href="/cart">My Cart</a></li>
+                    <li><a href="/orders">My Orders</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/features">Features</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function checkStrength(val) {
+            const segs = ['seg1','seg2','seg3','seg4'].map(id => document.getElementById(id));
+            const label = document.getElementById('strength-label');
+            let score = 0;
+            if (val.length >= 6) score++;
+            if (val.length >= 10) score++;
+            if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+            const colors = ['#ef4444','#f97316','#eab308','#4ade80'];
+            const labels = ['Weak','Fair','Good','Strong'];
+            segs.forEach((s, i) => s.style.background = i < score ? colors[score-1] : 'var(--border2)');
+            label.textContent = val.length === 0 ? 'Enter a password' : (labels[score-1] || 'Weak');
+            label.style.color = val.length === 0 ? 'var(--text-muted)' : colors[score-1];
+        }
+    </script>
+
+</body>
+</html>
