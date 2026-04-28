@@ -858,26 +858,59 @@ def cart_remove(book_id):
     return redirect('/cart')
 
 
-@app.route('/cart/checkout')
+@app.route('/cart/checkout', methods=['GET'])
 def cart_checkout():
     if 'user_id' not in session:
         return redirect('/login')
     cart_ids = get_cart_ids(session['user_id'])
+    if not cart_ids:
+        return redirect('/cart')
+    cart_books = []
+    for bid in cart_ids:
+        r = apply_book_images(db_get('books', {'id': f'eq.{bid}'}))
+        if r:
+            cart_books.append(r[0])
+    user = db_get('users', {'id': f"eq.{session['user_id']}"})
+    username = user[0]['username'] if user else 'Reader'
+    total = round(sum(float(b.get('price') or 0) for b in cart_books), 2)
+    return render_template('cart_checkout.html', cart_books=cart_books, total=total,
+        username=username, error=None, form=None)
+
+
+@app.route('/cart/checkout/place', methods=['POST'])
+def cart_checkout_place():
+    if 'user_id' not in session:
+        return redirect('/login')
+    street = request.form.get('street', '').strip()
+    location = request.form.get('location', '').strip()
+    payment = request.form.get('payment', '').strip()
+    cart_ids = get_cart_ids(session['user_id'])
+    if not cart_ids:
+        return redirect('/cart')
+    cart_books = []
+    for bid in cart_ids:
+        r = apply_book_images(db_get('books', {'id': f'eq.{bid}'}))
+        if r:
+            cart_books.append(r[0])
+    user = db_get('users', {'id': f"eq.{session['user_id']}"})
+    username = user[0]['username'] if user else 'Reader'
+    if not street or not location or payment not in ('COD', 'GCash'):
+        total = round(sum(float(b.get('price') or 0) for b in cart_books), 2)
+        return render_template('cart_checkout.html', cart_books=cart_books, total=total,
+            username=username, error='Please fill in all delivery details and select a payment method.',
+            form={'street': street, 'location': location, 'payment': payment})
     for book_id in cart_ids:
         try:
             book = db_get('books', {'id': f'eq.{book_id}'})
             if not book or int(book[0].get('stock') or 0) <= 0:
                 continue
-            try:
-                already = db_get('orders', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
-            except Exception:
-                already = []
+            already = db_get('orders', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
             if already:
                 continue
             db_post('orders', {'user_id': session['user_id'], 'book_id': book_id})
             db_patch('books', {'stock': int(book[0]['stock']) - 1}, {'id': f'eq.{book_id}'})
         except Exception as e:
-            print('Checkout error:', e)
+            print('Cart place error:', e)
     clear_cart(session['user_id'])
     return redirect('/orders?checkout=1')
 
@@ -889,10 +922,40 @@ def buy(book_id):
     if 'user_id' not in session:
         return redirect('/login')
     try:
-        _existing_order = db_get('orders', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
+        existing_order = db_get('orders', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
     except Exception:
-        _existing_order = []
-    if _existing_order:
+        existing_order = []
+    if existing_order:
+        return redirect(f'/book/{book_id}?already_owned=1')
+    book_result = apply_book_images(db_get('books', {'id': f'eq.{book_id}'}))
+    if not book_result or int(book_result[0].get('stock') or 0) <= 0:
+        return redirect(f'/book/{book_id}?out_of_stock=1')
+    user = db_get('users', {'id': f"eq.{session['user_id']}"})
+    username = user[0]['username'] if user else 'Reader'
+    return render_template('checkout.html', book=book_result[0], username=username, error=None, form=None)
+
+
+@app.route('/buy/<int:book_id>/place', methods=['POST'])
+def buy_place(book_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    street = request.form.get('street', '').strip()
+    location = request.form.get('location', '').strip()
+    payment = request.form.get('payment', '').strip()
+    book_result = apply_book_images(db_get('books', {'id': f'eq.{book_id}'}))
+    if not street or not location or payment not in ('COD', 'GCash'):
+        user = db_get('users', {'id': f"eq.{session['user_id']}"})
+        username = user[0]['username'] if user else 'Reader'
+        return render_template('checkout.html', book=book_result[0] if book_result else {}, username=username,
+            error='Please fill in all delivery details and select a payment method.',
+            form={'street': street, 'location': location, 'payment': payment})
+    if not book_result or int(book_result[0].get('stock') or 0) <= 0:
+        return redirect(f'/book/{book_id}?out_of_stock=1')
+    try:
+        existing_order = db_get('orders', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
+    except Exception:
+        existing_order = []
+    if existing_order:
         return redirect(f'/book/{book_id}?already_owned=1')
     book = db_get('books', {'id': f'eq.{book_id}'})
     if not book or int(book[0].get('stock') or 0) <= 0:
@@ -900,15 +963,14 @@ def buy(book_id):
     try:
         db_post('orders', {'user_id': session['user_id'], 'book_id': book_id})
         db_patch('books', {'stock': int(book[0]['stock']) - 1}, {'id': f'eq.{book_id}'})
-        # cancel any existing reservation for this book now that it's purchased
         existing_booking = db_get('bookings', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
         if existing_booking:
             HTTP.delete(f"{SUPABASE_URL}/rest/v1/bookings", headers=HEADERS,
                 params={'id': f"eq.{existing_booking[0]['id']}", 'user_id': f"eq.{session['user_id']}"}, timeout=15)
     except Exception as e:
-        print('Buy error:', e)
+        print('Buy place error:', e)
         return redirect(f'/book/{book_id}?error=1')
-    return redirect('/orders')
+    return redirect('/orders?checkout=1')
 
 
 # ── ORDERS ──────────────────────────────────────────────────

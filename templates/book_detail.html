@@ -45,10 +45,10 @@
 
         main { flex: 1; position: relative; z-index: 1; padding: 40px 36px; overflow-x: hidden; }
 
-        .book-layout { display: grid; grid-template-columns: 260px 1fr; gap: 48px; align-items: start; max-width: 900px; }
+        .book-layout { display: grid; grid-template-columns: 340px 1fr; gap: 48px; align-items: start; max-width: 980px; }
 
-        .book-cover { border-radius: 12px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.6); aspect-ratio: 3/4; position: relative; border: 1px solid var(--border); }
-        .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .book-cover { border-radius: 12px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.6); aspect-ratio: 3/4; position: relative; border: 1px solid var(--border); background: var(--surface2); }
+        .book-cover img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .book-cover-fallback { width: 100%; height: 100%; background: var(--surface2); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
         .fallback-icon { font-size: 4rem; }
         .fallback-title { font-size: 0.85rem; font-weight: 600; color: var(--text-soft); text-align: center; padding: 0 20px; }

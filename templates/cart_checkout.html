@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace — Checkout</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a1628; --surface: #0d1b35; --surface2: #111f3e;
+            --border: #1a2d52; --border2: #1f3660;
+            --gold: #c9a84c; --gold-light: #e8c96a;
+            --text: #e8edf5; --text-muted: #6b7a99; --text-soft: #9aa3bc;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+        nav { position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 60px; background: rgba(10,22,40,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px); }
+        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-logo-icon { width: 28px; height: 28px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+        .nav-logo span { color: var(--gold); }
+        .nav-right { display: flex; align-items: center; gap: 10px; }
+        .nav-user { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 5px 12px; font-size: 0.8rem; color: var(--text-soft); }
+        .nav-btn { padding: 6px 14px; background: transparent; border: 1px solid var(--border2); border-radius: 6px; color: var(--text-soft); font-size: 0.8rem; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+        main { flex: 1; position: relative; z-index: 1; padding: 48px 40px; display: flex; justify-content: center; }
+
+        .checkout-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 36px; width: 100%; max-width: 560px; }
+        .checkout-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .checkout-sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 28px; }
+
+        .items-list { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; }
+        .item-title { color: var(--text); font-weight: 500; }
+        .item-price { color: var(--gold); font-weight: 600; }
+        .items-total { border-top: 1px solid var(--border); padding-top: 10px; display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; color: var(--text); }
+        .items-total span:last-child { color: var(--gold); }
+
+        .section-label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 10px; }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 0.8rem; color: var(--text-soft); margin-bottom: 6px; }
+        .field input { width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 7px; color: var(--text); font-size: 0.875rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s; }
+        .field input:focus { border-color: var(--gold); }
+
+        .payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+        .payment-option { position: relative; }
+        .payment-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+        .payment-option label { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; cursor: pointer; font-size: 0.875rem; color: var(--text-soft); transition: all 0.2s; font-weight: 500; }
+        .payment-option input[type="radio"]:checked + label { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+        .payment-icon { font-size: 1.2rem; }
+
+        .error-msg { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; border-radius: 7px; padding: 10px 14px; font-size: 0.82rem; margin-bottom: 16px; }
+
+        .confirm-btn { display: block; width: 100%; padding: 14px; background: var(--gold); border: none; border-radius: 8px; color: #0a1628; font-size: 0.95rem; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; }
+        .confirm-btn:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); }
+        .cancel-link { display: block; text-align: center; margin-top: 12px; font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .cancel-link:hover { color: var(--text-soft); }
+
+        footer { position: relative; z-index: 1; margin-top: auto; background: var(--surface); border-top: 1px solid var(--border); padding: 28px 40px; }
+        .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-bottom-links { display: flex; gap: 20px; }
+        .footer-bottom-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; }
+        .footer-bottom-links a:hover { color: var(--gold); }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <nav>
+        <a href="/dashboard" class="nav-logo">
+            <div class="nav-logo-icon">📚</div>
+            Libra<span>Space</span>
+        </a>
+        <div class="nav-right">
+            <div class="nav-user">👤 {{ username }}</div>
+            <a href="/logout" class="nav-btn">Sign out</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="checkout-card">
+            <div class="checkout-title">Checkout</div>
+            <div class="checkout-sub">Fill in your delivery details to continue.</div>
+
+            <div class="items-list">
+                {% for book in cart_books %}
+                <div class="item-row">
+                    <span class="item-title">{{ book.title }}</span>
+                    <span class="item-price">₱{{ "%.2f"|format(book.price|float) }}</span>
+                </div>
+                {% endfor %}
+                <div class="items-total">
+                    <span>Total</span>
+                    <span>₱{{ "%.2f"|format(total) }}</span>
+                </div>
+            </div>
+
+            {% if error %}<div class="error-msg">⚠ {{ error }}</div>{% endif %}
+
+            <form method="POST" action="/cart/checkout/place">
+                <div class="section-label">Delivery Address</div>
+                <div class="field">
+                    <label>Street / House No.</label>
+                    <input type="text" name="street" placeholder="e.g. 123 Rizal St." required value="{{ form.street if form else '' }}">
+                </div>
+                <div class="field">
+                    <label>City / Municipality</label>
+                    <input type="text" name="location" placeholder="e.g. Cebu City" required value="{{ form.location if form else '' }}">
+                </div>
+
+                <div class="section-label" style="margin-top:20px;">Payment Method</div>
+                <div class="payment-options">
+                    <div class="payment-option">
+                        <input type="radio" name="payment" id="cod" value="COD" {% if not form or form.payment == 'COD' %}checked{% endif %}>
+                        <label for="cod"><span class="payment-icon">💵</span> Cash on Delivery</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" name="payment" id="gcash" value="GCash" {% if form and form.payment == 'GCash' %}checked{% endif %}>
+                        <label for="gcash"><span class="payment-icon">📱</span> GCash</label>
+                    </div>
+                </div>
+
+                <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;margin:20px 0;display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.875rem;">
+                        <span style="color:var(--text-soft);">Name</span>
+                        <span style="color:var(--text);font-weight:500;">{{ username }}</span>
+                    </div>
+                    <div style="border-top:1px solid var(--border);"></div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.875rem;">
+                        <span style="color:var(--text-soft);">Total</span>
+                        <span style="color:var(--gold);font-weight:700;">₱{{ "%.2f"|format(total) }}</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="confirm-btn">✓ Place Order</button>
+            </form>
+            <a href="/cart" class="cancel-link">← Back to Cart</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-bottom">
+            <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Support</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
