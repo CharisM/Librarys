@@ -25,6 +25,7 @@
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
@@ -213,6 +214,15 @@
             .split-left { display: none; }
             .split-right { width: 100%; padding: 40px 24px; }
         }
+        .split { flex: 1; }
+        footer { position: relative; z-index: 1; background: var(--surface); border-top: 1px solid var(--border); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
+        .pagination { display: flex; align-items: center; gap: 6px; }
+        .pagination a { padding: 6px 12px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; font-size: 0.8rem; color: var(--text-soft); text-decoration: none; transition: all 0.2s; }
+        .pagination a:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
     </style>
 </head>
 <body>
@@ -295,6 +305,5 @@
             </div>
         </div>
     </div>
-
 </body>
 </html>

@@ -28,10 +28,12 @@ app.config['MAIL_USERNAME'] = clean_env('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = clean_env('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = clean_env('MAIL_USERNAME')
 mail = Mail(app)
+CONTACT_RECIPIENT = clean_env('CONTACT_RECIPIENT') or clean_env('MAIL_USERNAME')
 
 SUPABASE_URL = clean_env("SUPABASE_URL") or clean_env("NEXT_PUBLIC_SUPABASE_URL")
 SUPABASE_KEY = (
-    clean_env("SUPABASE_KEY")
+    clean_env("SUPABASE_SERVICE_ROLE_KEY")
+    or clean_env("SUPABASE_KEY")
     or clean_env("SUPABASE_ANON_KEY")
     or clean_env("NEXT_PUBLIC_SUPABASE_ANON_KEY")
 )
@@ -44,6 +46,7 @@ HEADERS = {
 }
 HTTP = requests.Session()
 HTTP.trust_env = False
+HTTP.verify = False
 
 DEFAULT_BOOK_IMAGES = {
     "the notebook": "/static/img/THENOTEBOOK.jpg",
@@ -69,10 +72,37 @@ def supabase_config_error():
     if not SUPABASE_URL:
         missing.append("SUPABASE_URL")
     if not SUPABASE_KEY:
-        missing.append("SUPABASE_KEY")
+        missing.append("SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY")
     if missing:
         return "Supabase is not configured. Missing: " + ", ".join(missing)
     return None
+
+
+def mail_config_error():
+    missing = []
+    if not app.config.get('MAIL_USERNAME'):
+        missing.append("MAIL_USERNAME")
+    if not app.config.get('MAIL_PASSWORD'):
+        missing.append("MAIL_PASSWORD")
+    if not CONTACT_RECIPIENT:
+        missing.append("CONTACT_RECIPIENT")
+    if missing:
+        return "Email is not configured. Missing: " + ", ".join(missing)
+    return None
+
+
+def explain_mail_error(error):
+    error_text = str(error)
+    lower_error = error_text.lower()
+    if "email is not configured" in lower_error:
+        return error_text
+    if "username and password not accepted" in lower_error or "application-specific password" in lower_error:
+        return "Gmail rejected the login. Use a Gmail App Password, not your normal Gmail password."
+    if "authentication" in lower_error or "535" in lower_error:
+        return "Gmail authentication failed. Check MAIL_USERNAME and MAIL_PASSWORD."
+    if "connection" in lower_error or "timed out" in lower_error:
+        return "Could not connect to Gmail SMTP. Please try again."
+    return "Could not send the email right now. Please check your Gmail settings."
 
 
 def auth_page_context(error=None, success=None, debug_hint=None):
@@ -206,6 +236,36 @@ def send_otp_email(to_email, otp):
     mail.send(msg)
 
 
+def send_contact_email(name, sender_email, subject, message_body):
+    config_error = mail_config_error()
+    if config_error:
+        raise RuntimeError(config_error)
+    msg = Message(
+        subject=f"LibraSpace Contact: {subject}",
+        recipients=[CONTACT_RECIPIENT],
+        reply_to=sender_email
+    )
+    msg.body = (
+        "New contact form message\n\n"
+        f"Name: {name}\n"
+        f"Email: {sender_email}\n"
+        f"Subject: {subject}\n\n"
+        f"Message:\n{message_body}"
+    )
+    mail.send(msg)
+
+
+def save_contact_message(name, email, subject, message_body):
+    try:
+        db_post('contact_messages', {
+            'name': name, 'email': email,
+            'subject': subject, 'message': message_body,
+            'is_read': False
+        })
+    except Exception as e:
+        print('save_contact_message error:', e)
+
+
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
     from flask import jsonify
@@ -274,8 +334,29 @@ def about():
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
-        return render_template('contact.html', active_page='contact', sent=True)
-    return render_template('contact.html', active_page='contact', sent=False)
+        form = {
+            'name': request.form.get('name', '').strip(),
+            'email': request.form.get('email', '').strip(),
+            'subject': request.form.get('subject', 'General Inquiry').strip(),
+            'message': request.form.get('message', '').strip(),
+        }
+        if not form['name'] or not form['email'] or len(form['message']) < 10:
+            return render_template(
+                'contact.html',
+                active_page='contact',
+                sent=False,
+                error='Please fill in your name, email, and a message with at least 10 characters.',
+                form=form
+            )
+        # Always save to DB
+        save_contact_message(form['name'], form['email'], form['subject'], form['message'])
+        # Try to send email (non-blocking)
+        try:
+            send_contact_email(form['name'], form['email'], form['subject'], form['message'])
+        except Exception as e:
+            print('Contact mail error (non-fatal):', e)
+        return render_template('contact.html', active_page='contact', sent=True, error=None, form={})
+    return render_template('contact.html', active_page='contact', sent=False, error=None, form={})
 
 @app.route('/favicon.png')
 def favicon():
@@ -452,7 +533,6 @@ def admin_dashboard():
         all_books   = db_get('books')
         all_orders  = db_get('orders')
         all_users   = db_get('users')
-        all_bookings = db_get('bookings')
         pending_orders   = [o for o in all_orders if o.get('status','pending') == 'pending']
         shipped_orders   = [o for o in all_orders if o.get('status') == 'shipped']
         delivered_orders = [o for o in all_orders if o.get('status') == 'delivered']
@@ -481,7 +561,7 @@ def admin_dashboard():
                 if b: full_revenue += float(b[0].get('price',0) or 0)
     except Exception as e:
         print('Admin dashboard error:', e)
-        all_books=all_orders=all_users=all_bookings=[]
+        all_books=all_orders=all_users=[]
         pending_orders=shipped_orders=delivered_orders=cancelled_orders=[]
         out_of_stock=low_stock=recent_orders=[]
         full_revenue=0
@@ -490,7 +570,6 @@ def admin_dashboard():
         total_books=len(all_books),
         total_orders=len(all_orders),
         total_users=len(all_users),
-        total_bookings=len(all_bookings),
         pending_orders=len(pending_orders),
         shipped_orders=len(shipped_orders),
         delivered_orders=len(delivered_orders),
@@ -627,7 +706,8 @@ def dashboard():
         return render_template('dashboard.html', books=books, genres=genres,
             selected_genre=genre_filter, username=username, search_query=search_query,
             cart_count=cart_count, cart_items=cart_items,
-            page=page, total_pages=total_pages, total=total)
+            page=page, total_pages=total_pages, total=total,
+            active_page='dashboard')
     except Exception as e:
         print("Dashboard error:", str(e))
         return redirect('/login')
@@ -690,7 +770,8 @@ def reservations():
                 entry['booking_id'] = booking['id']
                 entry['reserved_at'] = booking.get('created_at', '')
                 reserved_books.append(entry)
-        return render_template('reservations.html', reserved_books=reserved_books, username=username)
+        cart_count = len(get_cart_ids(session['user_id']))
+        return render_template('reservations.html', reserved_books=reserved_books, username=username, cart_count=cart_count)
     except Exception as e:
         print("Reservations error:", str(e))
         return redirect('/dashboard')
@@ -724,10 +805,15 @@ def profile_render(**kwargs):
         orders_count = len(orders)
     except Exception:
         orders_count = 0
+    try:
+        genres = sorted(set(b.get('genre') for b in apply_book_images(db_get('books')) if b.get('genre')))
+    except Exception:
+        genres = []
     ctx = dict(username=username, email=email, phone=phone, orders_count=orders_count,
         username_error=None, username_success=None,
         password_error=None, password_success=None,
-        contact_error=None, contact_success=None)
+        contact_error=None, contact_success=None,
+        genres=genres, selected_genre=None)
     ctx.update(kwargs)
     return render_template('profile.html', **ctx)
 
@@ -752,13 +838,15 @@ def profile_username():
         if not new_username or len(new_username) < 3:
             return profile_render(username_error='Username must be at least 3 characters.')
         existing = db_get('users', {'username': f'eq.{new_username}'})
-        if existing:
+        if existing and existing[0]['id'] != session['user_id']:
             return profile_render(username_error='That username is already taken.')
-        db_patch('users', {'username': new_username}, {'id': f"eq.{session['user_id']}"})
+        result = db_patch('users', {'username': new_username}, {'id': f"eq.{session['user_id']}"})
+        if not result:
+            return profile_render(username_error='Update failed. This may be blocked by a database policy. Please contact support.')
         return profile_render(username_success='Username updated successfully!')
     except Exception as e:
         print("Profile username error:", str(e))
-        return profile_render(username_error='Something went wrong. Please try again.')
+        return profile_render(username_error=explain_supabase_error(e))
 
 
 @app.route('/profile/password', methods=['POST'])
@@ -839,7 +927,8 @@ def cart():
             total += float(result[0].get('price') or 0)
     user = db_get('users', {'id': f"eq.{session['user_id']}"})
     username = user[0]['username'] if user else 'Reader'
-    return render_template('cart.html', cart_books=cart_books, total=round(total, 2), username=username)
+    genres = sorted(set(b.get('genre') for b in apply_book_images(db_get('books')) if b.get('genre')))
+    return render_template('cart.html', cart_books=cart_books, total=round(total, 2), username=username, cart_count=len(cart_ids), genres=genres, selected_genre=None)
 
 
 @app.route('/cart/add/<int:book_id>')
@@ -1011,10 +1100,12 @@ def orders():
                     ordered_books.append(entry)
             except Exception as e:
                 print('Orders row error:', e)
-        return render_template('orders.html', ordered_books=ordered_books, username=username)
+        cart_count = len(get_cart_ids(session['user_id']))
+        genres = sorted(set(b.get('genre') for b in apply_book_images(db_get('books')) if b.get('genre')))
+        return render_template('orders.html', ordered_books=ordered_books, username=username, cart_count=cart_count, genres=genres, selected_genre=None)
     except Exception as e:
         print('Orders error:', e)
-        return render_template('orders.html', ordered_books=[], username='Reader')
+        return render_template('orders.html', ordered_books=[], username='Reader', cart_count=0, genres=[], selected_genre=None)
 
 
 @app.route('/order/cancel/<int:order_id>')
@@ -1134,6 +1225,44 @@ def admin_pending_count():
         return jsonify({'count': len(orders)})
     except Exception:
         return jsonify({'count': 0})
+
+
+@app.route('/admin/contact-messages/unread-count')
+def admin_contact_unread_count():
+    from flask import jsonify
+    redir = admin_required()
+    if redir: return jsonify({'count': 0})
+    try:
+        msgs = db_get('contact_messages', {'is_read': 'eq.false'})
+        return jsonify({'count': len(msgs)})
+    except Exception:
+        return jsonify({'count': 0})
+
+
+@app.route('/admin/contact-messages')
+def admin_contact_messages():
+    redir = admin_required()
+    if redir: return redir
+    username = session.get('admin_username', 'Admin')
+    try:
+        messages = sorted(
+            db_get('contact_messages'),
+            key=lambda x: x.get('created_at', ''), reverse=True
+        )
+    except Exception:
+        messages = []
+    return render_template('admin_contact_messages.html', messages=messages, username=username)
+
+
+@app.route('/admin/contact-messages/<int:msg_id>/read', methods=['POST'])
+def admin_contact_mark_read(msg_id):
+    redir = admin_required()
+    if redir: return redir
+    try:
+        db_patch('contact_messages', {'is_read': True}, {'id': f'eq.{msg_id}'})
+    except Exception as e:
+        print('mark read error:', e)
+    return redirect('/admin/contact-messages')
 
 
 @app.route('/admin/order/<int:order_id>/status', methods=['POST'])

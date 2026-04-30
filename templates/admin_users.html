@@ -23,6 +23,16 @@
         .nav-user { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 5px 12px; font-size: 0.78rem; color: var(--text-soft); }
         .nav-btn { padding: 6px 14px; background: transparent; border: 1px solid var(--border2); border-radius: 7px; color: var(--text-soft); font-size: 0.78rem; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; }
         .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .notif-btn { position: relative; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background: transparent; border: 1px solid var(--border2); border-radius: 7px; color: var(--text-soft); font-size: 1rem; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+        .notif-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .notif-badge { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; background: #ef4444; color: #fff; font-size: 0.62rem; font-weight: 700; border-radius: 100px; display: none; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg); }
+        .notif-popup { position: fixed; top: 70px; right: 20px; z-index: 9999; background: var(--surface); border: 1px solid var(--gold); border-radius: 12px; padding: 18px 22px; box-shadow: 0 16px 48px rgba(0,0,0,0.6); display: none; min-width: 260px; animation: popIn 0.3s ease; }
+        @keyframes popIn { from { opacity: 0; transform: translateY(-10px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .notif-popup-title { font-size: 0.78rem; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+        .notif-popup-msg { font-size: 0.85rem; color: var(--text); margin-bottom: 14px; }
+        .notif-popup-link { display: block; text-align: center; padding: 8px; background: var(--gold); color: #0a1628; border-radius: 7px; font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+        .notif-popup-link:hover { background: var(--gold-light); }
+        .notif-close { position: absolute; top: 10px; right: 12px; background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; }
         .layout { display: flex; flex: 1; position: relative; z-index: 1; }
         .sidebar { width: 230px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); position: fixed; top: 62px; left: 0; height: calc(100vh - 62px); overflow-y: auto; z-index: 50; scrollbar-width: none; display: flex; flex-direction: column; }
         .sidebar::-webkit-scrollbar { display: none; }
@@ -94,6 +104,10 @@
         </a>
         <div class="nav-right">
             <div class="nav-user">🛡️ {{ username }}</div>
+            <a href="#" class="notif-btn" id="notifBtn" title="Notifications">
+                🔔
+                <span class="notif-badge" id="notifBadge"></span>
+            </a>
             <a href="/admin/logout" class="nav-btn">Sign out</a>
         </div>
     </nav>
@@ -112,7 +126,7 @@
                 <a href="/admin" class="sidebar-link"><span class="sidebar-icon">📚</span> Manage Books</a>
                 <a href="/admin/orders" class="sidebar-link"><span class="sidebar-icon">📦</span> All Orders</a>
                 <a href="/admin/users" class="sidebar-link active"><span class="sidebar-icon">👥</span> Users</a>
-                <a href="/admin/reservations" class="sidebar-link"><span class="sidebar-icon">🔖</span> Reservations</a>
+                <a href="/admin/contact-messages" class="sidebar-link"><span class="sidebar-icon">✉️</span> Messages</a>
             </div>
         </aside>
         <main>
@@ -181,6 +195,23 @@
             document.getElementById('confirmNo').onclick  = () => { overlay.style.display='none'; };
             return false;
         }
+    </script>
+
+    <div class="notif-popup" id="notifPopup">
+        <button class="notif-close" id="notifClose">✕</button>
+        <div class="notif-popup-title" id="notifTitle">🔔 Notification</div>
+        <div class="notif-popup-msg" id="notifMsg"></div>
+        <a href="#" class="notif-popup-link" id="notifLink">View →</a>
+    </div>
+    <script>
+        (function(){
+            const badge=document.getElementById('notifBadge'),popup=document.getElementById('notifPopup'),btn=document.getElementById('notifBtn'),close=document.getElementById('notifClose'),msg=document.getElementById('notifMsg'),title=document.getElementById('notifTitle'),link=document.getElementById('notifLink');
+            let lastOrders=0,lastMsgs=0;
+            function check(){Promise.all([fetch('/admin/orders/pending-count').then(r=>r.json()).catch(()=>({count:0})),fetch('/admin/contact-messages/unread-count').then(r=>r.json()).catch(()=>({count:0}))]).then(([o,m])=>{const oCount=o.count||0,mCount=m.count||0,total=oCount+mCount;badge.style.display=total>0?'flex':'none';if(total>0)badge.textContent=total;if(mCount>lastMsgs){title.textContent='✉️ New Message!';msg.textContent=`${mCount} unread contact message${mCount>1?'s':''}.`;link.href='/admin/contact-messages';link.textContent='View Messages →';popup.style.display='block';}else if(oCount>lastOrders){title.textContent='🔔 New Order!';msg.textContent=`${oCount} pending order${oCount>1?'s':''} waiting for review.`;link.href='/admin/orders';link.textContent='View Orders →';popup.style.display='block';}lastOrders=oCount;lastMsgs=mCount;});}
+            btn.addEventListener('click',e=>{e.preventDefault();if(popup.style.display==='block'){popup.style.display='none';return;}Promise.all([fetch('/admin/orders/pending-count').then(r=>r.json()).catch(()=>({count:0})),fetch('/admin/contact-messages/unread-count').then(r=>r.json()).catch(()=>({count:0}))]).then(([o,m])=>{const oCount=o.count||0,mCount=m.count||0;if(mCount>0){title.textContent='✉️ Unread Messages';msg.textContent=`${mCount} unread message${mCount>1?'s':''} and ${oCount} pending order${oCount!==1?'s':''}.`;link.href='/admin/contact-messages';link.textContent='View Messages →';}else if(oCount>0){title.textContent='🔔 Pending Orders';msg.textContent=`${oCount} pending order${oCount>1?'s':''} waiting for review.`;link.href='/admin/orders';link.textContent='View Orders →';}else{title.textContent='✅ All Clear';msg.textContent='No pending orders or unread messages.';link.href='/admin/dashboard';link.textContent='Go to Dashboard →';}popup.style.display='block';});});
+            close.addEventListener('click',()=>popup.style.display='none');
+            check();setInterval(check,30000);
+        })();
     </script>
 </body>
 </html>

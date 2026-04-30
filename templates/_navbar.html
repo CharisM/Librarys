@@ -1,0 +1,54 @@
+<style>
+    nav {
+        position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 0 40px; height: 62px;
+        background: rgba(10,22,40,0.97);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(20px);
+    }
+    .nav-logo {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem; font-weight: 700;
+        color: var(--text); text-decoration: none;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo-icon {
+        width: 28px; height: 28px; background: var(--gold);
+        border-radius: 6px; display: flex; align-items: center;
+        justify-content: center; font-size: 0.8rem;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-center { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-center a {
+        font-size: 0.82rem; font-weight: 500;
+        color: var(--text-muted); text-decoration: none;
+        transition: color 0.2s;
+    }
+    .nav-center a:hover, .nav-center a.active { color: var(--text); }
+    .nav-center a.active { color: var(--gold); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-btn {
+        padding: 7px 16px; background: transparent;
+        border: 1px solid var(--border2); border-radius: 6px;
+        color: var(--text-soft); font-size: 0.82rem;
+        font-family: 'Inter', sans-serif; cursor: pointer;
+        text-decoration: none; transition: all 0.2s;
+    }
+    .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+</style>
+
+<nav>
+    <a href="/dashboard" class="nav-logo">
+        <div class="nav-logo-icon">📚</div>
+        Libra<span>Space</span>
+    </a>
+    <ul class="nav-center">
+        <li><a href="/dashboard" class="{{ 'active' if active_page == 'dashboard' }}">Dashboard</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+        <a href="/logout" class="nav-btn">Sign out</a>
+    </div>
+</nav>

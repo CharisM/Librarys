@@ -9,18 +9,17 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #070e1a;
-            --surface: #0c1628;
-            --surface2: #101e35;
-            --surface3: #152240;
-            --border: #182a48;
-            --border2: #1e3358;
+            --bg: #0a1628;
+            --surface: #0d1b35;
+            --surface2: #111f3e;
+            --surface3: #162548;
+            --border: #1a2d52;
+            --border2: #1f3660;
             --gold: #c9a84c;
             --gold-light: #e8c96a;
-            --gold-dim: rgba(201,168,76,0.12);
             --text: #e8edf5;
-            --text-muted: #5a6a88;
-            --text-soft: #8a96b4;
+            --text-muted: #6b7a99;
+            --text-soft: #9aa3bc;
             --green: #4ade80;
         }
 
@@ -43,196 +42,11 @@
                 linear-gradient(90deg, rgba(201,168,76,0.025) 1px, transparent 1px);
             background-size: 56px 56px;
         }
-        .glow-orb {
-            position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
-            filter: blur(100px);
-        }
-        .glow-orb-1 { width: 500px; height: 500px; background: rgba(201,168,76,0.05); top: -150px; right: -100px; }
-        .glow-orb-2 { width: 400px; height: 400px; background: rgba(79,120,247,0.04); bottom: 0; left: -80px; }
-
-        /* NAV */
-        nav {
-            position: sticky; top: 0; z-index: 100;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 32px; height: 62px;
-            background: rgba(7,14,26,0.97);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(24px);
-        }
-        .nav-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.1rem; font-weight: 700;
-            color: var(--text); text-decoration: none;
-            display: flex; align-items: center; gap: 9px;
-        }
-        .nav-logo-icon {
-            width: 32px; height: 32px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border-radius: 8px; display: flex; align-items: center;
-            justify-content: center; font-size: 0.9rem;
-            box-shadow: 0 0 18px rgba(201,168,76,0.25);
-        }
-        .nav-logo span { color: var(--gold); }
-
-        .nav-center {
-            display: flex; align-items: center; gap: 4px;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 4px;
-        }
-        .nav-action {
-            display: flex; align-items: center; gap: 8px;
-            padding: 7px 14px; border-radius: 9px;
-            font-size: 0.78rem; font-weight: 500; color: var(--text-soft);
-            text-decoration: none; transition: all 0.2s;
-            position: relative; white-space: nowrap;
-        }
-        .nav-action:hover { background: var(--surface3); color: var(--text); }
-        .nav-action-icon {
-            width: 26px; height: 26px; border-radius: 7px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem; flex-shrink: 0;
-        }
-        .nav-action-icon.orders { background: rgba(79,142,247,0.15); }
-        .nav-action-icon.cart   { background: rgba(201,168,76,0.15); }
-        .nav-action-icon.profile{ background: rgba(74,222,128,0.12); }
-        .nav-action-text { letter-spacing: 0.1px; }
-        .nav-badge {
-            min-width: 17px; height: 17px;
-            background: var(--gold); color: #070e1a;
-            font-size: 0.6rem; font-weight: 700;
-            border-radius: 100px; display: flex;
-            align-items: center; justify-content: center;
-            padding: 0 4px; margin-left: 2px;
-        }
-
-        .nav-right { display: flex; align-items: center; gap: 8px; }
-        .nav-user {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--surface2); border: 1px solid var(--border2);
-            border-radius: 8px; padding: 5px 12px;
-            font-size: 0.78rem; color: var(--text-soft);
-        }
-        .nav-user-dot {
-            width: 7px; height: 7px; background: var(--green);
-            border-radius: 50%; flex-shrink: 0;
-            box-shadow: 0 0 6px var(--green);
-        }
-        .nav-btn {
-            padding: 6px 14px; background: transparent;
-            border: 1px solid var(--border2); border-radius: 7px;
-            color: var(--text-soft); font-size: 0.78rem;
-            font-family: 'Inter', sans-serif; cursor: pointer;
-            text-decoration: none; transition: all 0.2s;
-        }
-        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-        /* LAYOUT */
-        .layout { display: flex; flex: 1; position: relative; z-index: 1; }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 230px; flex-shrink: 0;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            position: fixed; top: 62px; left: 0;
-            height: calc(100vh - 62px);
-            overflow-y: auto; z-index: 50;
-            scrollbar-width: none;
-            display: flex; flex-direction: column;
-        }
-        .sidebar::-webkit-scrollbar { display: none; }
-
-        .sidebar-user {
-            padding: 20px 16px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 12px;
-        }
-        .sidebar-avatar {
-            width: 38px; height: 38px; flex-shrink: 0;
-            background: linear-gradient(135deg, var(--gold-dim), rgba(201,168,76,0.25));
-            border: 1px solid rgba(201,168,76,0.3);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
-        }
-        .sidebar-user-info { overflow: hidden; }
-        .sidebar-username {
-            font-size: 0.82rem; font-weight: 600; color: var(--text);
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .sidebar-role {
-            font-size: 0.68rem; color: var(--text-muted);
-            display: flex; align-items: center; gap: 4px; margin-top: 2px;
-        }
-        .sidebar-role-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; }
-
-        .sidebar-nav { padding: 12px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
-
-        .sidebar-section {
-            font-size: 0.62rem; font-weight: 700; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 1.2px;
-            padding: 10px 8px 6px;
-        }
-        .sidebar-section:first-child { padding-top: 2px; }
-
-        .sidebar-link {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 10px; border-radius: 8px;
-            font-size: 0.82rem; color: var(--text-soft);
-            text-decoration: none; transition: all 0.18s; font-weight: 500;
-            position: relative;
-        }
-        .sidebar-link:hover { background: var(--surface2); color: var(--text); }
-        .sidebar-link.active {
-            background: var(--gold-dim);
-            color: var(--gold);
-            border: 1px solid rgba(201,168,76,0.18);
-        }
-        .sidebar-link.active::before {
-            content: '';
-            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-            width: 3px; height: 60%; background: var(--gold);
-            border-radius: 0 3px 3px 0;
-        }
-        .sidebar-icon { font-size: 0.95rem; width: 20px; text-align: center; flex-shrink: 0; }
-        .sidebar-link-text { flex: 1; }
-
-        .cart-badge {
-            min-width: 18px; height: 18px;
-            background: var(--gold); color: #070e1a;
-            font-size: 0.62rem; font-weight: 700;
-            border-radius: 100px; display: flex;
-            align-items: center; justify-content: center;
-            padding: 0 5px;
-        }
-
-        .sidebar-divider {
-            height: 1px; background: var(--border);
-            margin: 6px 10px;
-        }
-
-        .genre-pill {
-            display: flex; align-items: center; gap: 8px;
-            padding: 6px 10px; border-radius: 7px;
-            font-size: 0.8rem; color: var(--text-muted);
-            text-decoration: none; transition: all 0.18s;
-        }
-        .genre-pill::before {
-            content: ''; width: 5px; height: 5px;
-            border-radius: 50%; background: var(--border2);
-            flex-shrink: 0; transition: background 0.18s;
-        }
-        .genre-pill:hover { background: var(--surface2); color: var(--text); }
-        .genre-pill:hover::before { background: var(--text-soft); }
-        .genre-pill.active { color: var(--gold); font-weight: 600; }
-        .genre-pill.active::before { background: var(--gold); }
 
         /* MAIN */
         main {
-            flex: 1; margin-left: 230px;
-            padding: 28px 32px;
+            flex: 1;
+            padding: 90px 32px 28px;
             overflow-x: hidden;
             min-height: calc(100vh - 62px);
         }
@@ -360,37 +174,36 @@
         /* BOOKS GRID */
         .books-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
         }
         .book-card {
             background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; overflow: hidden;
+            border-radius: 10px; overflow: hidden;
             display: flex; flex-direction: column;
-            transition: all 0.25s; cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
         }
         .book-card:hover {
-            border-color: rgba(201,168,76,0.4);
+            border-color: var(--gold);
             transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.1);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
         }
         .book-cover-wrap { position: relative; width: 100%; height: 200px; overflow: hidden; }
         .book-cover-img {
             width: 100%; height: 100%; object-fit: cover; display: block;
-            transition: transform 0.35s;
+            transition: transform 0.3s;
         }
-        .book-card:hover .book-cover-img { transform: scale(1.07); }
+        .book-card:hover .book-cover-img { transform: scale(1.04); }
         .book-cover-placeholder {
             width: 100%; height: 100%; background: var(--surface2);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3rem;
+            display: flex; align-items: center; justify-content: center; font-size: 3rem;
         }
         .book-genre-badge {
-            position: absolute; top: 8px; left: 8px;
-            font-size: 0.6rem; font-weight: 700;
-            background: rgba(7,14,26,0.85);
+            position: absolute; top: 10px; left: 10px;
+            font-size: 0.68rem; font-weight: 600;
+            background: rgba(10,22,40,0.85);
             border: 1px solid rgba(201,168,76,0.3);
-            color: var(--gold); padding: 3px 9px;
+            color: var(--gold); padding: 3px 10px;
             border-radius: 100px; backdrop-filter: blur(8px);
             text-transform: uppercase; letter-spacing: 0.5px;
         }
@@ -402,13 +215,13 @@
             color: var(--gold-light); padding: 3px 9px;
             border-radius: 100px; backdrop-filter: blur(8px);
         }
-        .book-body { padding: 12px 14px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .book-title { font-size: 0.85rem; font-weight: 600; color: var(--text); line-height: 1.4; }
-        .book-author { font-size: 0.73rem; color: var(--text-muted); }
+        .book-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .book-title { font-size: 0.9rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+        .book-author { font-size: 0.78rem; color: var(--text-muted); }
         .book-footer {
-            padding: 9px 14px;
+            padding: 12px 16px;
             border-top: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex; gap: 8px;
         }
         .avail-badge { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--green); }
         .avail-dot {
@@ -417,12 +230,12 @@
         }
         @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.6);opacity:0.4} }
         .view-btn {
-            padding: 5px 13px; background: var(--gold);
-            border-radius: 6px; color: #070e1a;
-            font-size: 0.73rem; font-weight: 700;
-            text-decoration: none; transition: all 0.2s;
+            flex: 1; padding: 8px 12px; background: var(--gold);
+            border-radius: 6px; color: #0a1628;
+            font-size: 0.78rem; font-weight: 700;
+            text-decoration: none; text-align: center; transition: all 0.2s;
         }
-        .view-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+        .view-btn:hover { background: var(--gold-light); }
 
         /* EMPTY */
         .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
@@ -444,86 +257,118 @@
         .page-btn:hover { border-color: var(--gold); color: var(--gold); }
         .page-btn.active { background: var(--gold); color: #070e1a; border-color: var(--gold); }
 
+        footer {
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(180deg, #0b1a30 0%, #060e1c 100%);
+            border-top: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .footer-glow {
+            position: absolute;
+            width: 500px; height: 300px;
+            background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+            top: -80px; left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .footer-inner {
+            position: relative;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 60px 40px 32px;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 1.8fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; font-weight: 700;
+            color: var(--text);
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 14px;
+            text-decoration: none;
+        }
+        .footer-brand-logo span { color: var(--gold); }
+        .footer-brand-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+        }
+        .footer-tagline {
+            font-size: 0.84rem; color: var(--text-muted);
+            line-height: 1.8; margin-bottom: 22px; max-width: 260px;
+        }
+        .footer-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: rgba(74,222,128,0.07);
+            border: 1px solid rgba(74,222,128,0.18);
+            border-radius: 100px; padding: 5px 13px;
+            font-size: 0.71rem; color: #4ade80; font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .footer-badge-dot {
+            width: 6px; height: 6px;
+            background: #4ade80; border-radius: 50%;
+            animation: fp 2s ease-in-out infinite;
+        }
+        @keyframes fp { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.6)} }
+
+        .footer-col-title {
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--text-soft); text-transform: uppercase;
+            letter-spacing: 1.4px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .footer-col-title::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .footer-col ul li a {
+            font-size: 0.84rem; color: var(--text-muted);
+            text-decoration: none; transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .footer-col ul li a::before {
+            content: '';
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            background: var(--border2);
+            transition: all 0.2s; flex-shrink: 0;
+        }
+        .footer-col ul li a:hover { color: var(--gold); transform: translateX(3px); }
+        .footer-col ul li a:hover::before { background: var(--gold); }
+
         @media (max-width: 900px) {
-            .sidebar { display: none; }
-            main { margin-left: 0; padding: 20px 16px; }
+            main { margin-left: 0; padding: 82px 16px 20px; }
             .stats-row { grid-template-columns: 1fr 1fr; }
+            .footer-inner { padding: 40px 24px 24px; }
+            .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
         }
         @media (max-width: 560px) {
             .stats-row { grid-template-columns: 1fr; }
             .hero-deco { display: none; }
+            .footer-top { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
     <div class="grid-bg"></div>
-    <div class="glow-orb glow-orb-1"></div>
-    <div class="glow-orb glow-orb-2"></div>
-
-    <nav>
-        <a href="/dashboard" class="nav-logo">
-            <div class="nav-logo-icon">📚</div>
-            Libra<span>Space</span>
-        </a>
-        <div class="nav-right">
-            <div class="nav-user">
-                <div class="nav-user-dot"></div>
-                {{ username }}
-            </div>
-            <a href="/logout" class="nav-btn">Sign out</a>
-        </div>
-    </nav>
-
-    <div class="layout">
-
-        <aside class="sidebar">
-            <div class="sidebar-user">
-                <div class="sidebar-avatar">👤</div>
-                <div class="sidebar-user-info">
-                    <div class="sidebar-username">{{ username }}</div>
-                    <div class="sidebar-role">
-                        <div class="sidebar-role-dot"></div>
-                        Active Member
-                    </div>
-                </div>
-            </div>
-
-            <div class="sidebar-nav">
-                <div class="sidebar-section">Browse</div>
-                <a href="/dashboard" class="sidebar-link active">
-                    <span class="sidebar-icon">📚</span>
-                    <span class="sidebar-link-text">All Books</span>
-                </a>
-                <a href="/orders" class="sidebar-link">
-                    <span class="sidebar-icon">📦</span>
-                    <span class="sidebar-link-text">My Orders</span>
-                </a>
-
-                <div class="sidebar-section">Cart</div>
-                <a href="/cart" class="sidebar-link">
-                    <span class="sidebar-icon">🛒</span>
-                    <span class="sidebar-link-text">My Cart</span>
-                    {% if cart_count > 0 %}<span class="cart-badge">{{ cart_count }}</span>{% endif %}
-                </a>
-
-                <div class="sidebar-section">Account</div>
-                <a href="/profile" class="sidebar-link">
-                    <span class="sidebar-icon">👤</span>
-                    <span class="sidebar-link-text">My Profile</span>
-                </a>
-
-                {% if genres %}
-                <div class="sidebar-divider"></div>
-                <div class="sidebar-section">Genres</div>
-                <a href="/dashboard" class="genre-pill {{ 'active' if not selected_genre }}">All Genres</a>
-                {% for genre in genres %}
-                <a href="/dashboard?genre={{ genre }}" class="genre-pill {{ 'active' if selected_genre == genre }}">{{ genre }}</a>
-                {% endfor %}
-                {% endif %}
-            </div>
-        </aside>
-
+    {% set active_page = 'dashboard' %}
+    {% include '_navbar.html' %}
+    {% include '_sidebar.html' %}
         <main>
             <!-- HERO -->
             <div class="hero">
@@ -580,23 +425,21 @@
             <div class="books-grid">
                 {% for book in books %}
                 <div class="book-card">
-                    <a href="/book/{{ book.id }}" style="text-decoration:none;display:block;">
-                        <div class="book-cover-wrap">
-                            {% set book_image = book.image_url or book.cover_url %}
-                            {% if book_image %}
-                            <img src="{{ book_image }}" alt="{{ book.title }}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                            <div class="book-cover-placeholder" style="display:none">📖</div>
-                            {% else %}
-                            <div class="book-cover-placeholder">📖</div>
-                            {% endif %}
-                            <div class="book-genre-badge">{{ book.genre if book.genre else 'General' }}</div>
-                            {% set price = book.get('price') %}{% if price is not none %}<div class="book-price-badge">₱{{ "%.2f"|format(price|float) }}</div>{% endif %}
-                        </div>
-                        <div class="book-body">
-                            <div class="book-title">{{ book.title }}</div>
-                            {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
-                        </div>
-                    </a>
+                    <div class="book-cover-wrap">
+                        {% set book_image = book.image_url or book.cover_url %}
+                        {% if book_image %}
+                        <img src="{{ book_image }}" alt="{{ book.title }}" class="book-cover-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="book-cover-placeholder" style="display:none">📖</div>
+                        {% else %}
+                        <div class="book-cover-placeholder">📖</div>
+                        {% endif %}
+                        <div class="book-genre-badge">{{ book.genre if book.genre else 'General' }}</div>
+                        {% set price = book.get('price') %}{% if price is not none %}<div class="book-price-badge">₱{{ "%.2f"|format(price|float) }}</div>{% endif %}
+                    </div>
+                    <div class="book-body">
+                        <div class="book-title">{{ book.title }}</div>
+                        {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
+                    </div>
                     <div class="book-footer">
                         <div class="avail-badge"><div class="avail-dot"></div> Available</div>
                         <a href="/book/{{ book.id }}" class="view-btn">View →</a>
@@ -627,7 +470,41 @@
             {% endif %}
 
         </main>
-    </div>
-
+    <footer>
+        <div class="footer-glow"></div>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="/dashboard" class="footer-brand-logo">
+                        <div class="footer-brand-icon">&#128218;</div>
+                        Libra<span>Space</span>
+                    </a>
+                    <p class="footer-tagline">Your curated digital library &mdash; discover, reserve, and enjoy great books from anywhere.</p>
+                    <div class="footer-badge">
+                        <div class="footer-badge-dot"></div>
+                        All systems operational
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Navigate</div>
+                    <ul>
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <div class="footer-col-title">Account</div>
+                    <ul>
+                        <li><a href="/dashboard">Browse Books</a></li>
+                        <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/orders">My Orders</a></li>
+                        <li><a href="/logout">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    </div></div>
 </body>
 </html>

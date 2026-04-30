@@ -65,30 +65,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 60px;
-            height: 68px;
-            background: rgba(10, 22, 40, 0.92);
-            backdrop-filter: blur(24px);
+            padding: 0 40px;
+            height: 62px;
+            background: rgba(10, 22, 40, 0.97);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
         }
 
         .nav-logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--text);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .nav-logo-icon {
-            width: 32px; height: 32px;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            border-radius: 8px;
+            width: 28px; height: 28px;
+            background: var(--gold);
+            border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .nav-logo span { color: var(--gold); }
@@ -96,17 +96,16 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 40px;
+            gap: 32px;
             list-style: none;
         }
 
         .nav-links a {
-            font-size: 0.875rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s;
-            letter-spacing: 0.3px;
         }
 
         .nav-links a:hover, .nav-links a.active { color: var(--text); }
@@ -115,12 +114,12 @@
         .nav-actions { display: flex; align-items: center; gap: 10px; }
 
         .btn-ghost {
-            padding: 8px 20px;
+            padding: 7px 16px;
             background: transparent;
             border: 1px solid var(--border2);
             border-radius: 6px;
             color: var(--text-soft);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 500;
             text-decoration: none;
             transition: all 0.2s;
@@ -130,22 +129,21 @@
         .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
 
         .btn-primary {
-            padding: 8px 20px;
+            padding: 7px 16px;
             background: var(--gold);
             border: none;
             border-radius: 6px;
             color: #0a1628;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 700;
             text-decoration: none;
             transition: all 0.2s;
             font-family: 'Inter', sans-serif;
-            letter-spacing: 0.3px;
         }
 
         .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
 
-        main { flex: 1; position: relative; z-index: 1; padding-top: 68px; }
+        main { flex: 1; position: relative; z-index: 1; padding-top: 62px; }
 
         footer {
             position: relative;
@@ -173,7 +171,7 @@
 
         .footer-top {
             display: grid;
-            grid-template-columns: 1.8fr 1fr 1fr 1fr;
+            grid-template-columns: 1.8fr 1fr 1fr;
             gap: 48px;
             margin-bottom: 48px;
         }
@@ -240,48 +238,6 @@
         .footer-col ul li a:hover { color: var(--gold); transform: translateX(3px); }
         .footer-col ul li a:hover::before { background: var(--gold); }
 
-        .footer-divider {
-            height: 1px;
-            background: linear-gradient(90deg,
-                transparent 0%,
-                var(--border) 20%,
-                rgba(201,168,76,0.3) 50%,
-                var(--border) 80%,
-                transparent 100%);
-            margin-bottom: 28px;
-        }
-
-        .footer-bottom {
-            display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 16px;
-        }
-        .footer-copy {
-            font-size: 0.78rem; color: var(--text-muted);
-        }
-        .footer-copy strong { color: var(--gold); font-weight: 600; }
-        .footer-socials { display: flex; gap: 8px; }
-        .footer-social {
-            width: 36px; height: 36px;
-            background: var(--surface2);
-            border: 1px solid var(--border2);
-            border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            text-decoration: none; font-size: 0.9rem;
-            transition: all 0.25s; color: var(--text-muted);
-        }
-        .footer-social:hover {
-            border-color: var(--gold);
-            background: rgba(201,168,76,0.08);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(201,168,76,0.15);
-        }
-        .footer-legal { display: flex; gap: 20px; }
-        .footer-legal a {
-            font-size: 0.76rem; color: var(--text-muted);
-            text-decoration: none; transition: color 0.2s;
-        }
-        .footer-legal a:hover { color: var(--gold); }
-
         @media (max-width: 900px) {
             nav { padding: 0 24px; }
             .nav-links { display: none; }
@@ -290,7 +246,6 @@
         }
         @media (max-width: 560px) {
             .footer-top { grid-template-columns: 1fr; }
-            .footer-bottom { flex-direction: column; text-align: center; }
         }
 
         {% block extra_styles %}{% endblock %}
@@ -303,19 +258,27 @@
     <div class="glow glow-2"></div>
 
     <nav>
-        <a href="/" class="nav-logo">
+        <a href="{{ '/dashboard' if session.get('user_id') else '/' }}" class="nav-logo">
             <div class="nav-logo-icon">📚</div>
             Libra<span>Space</span>
         </a>
         <ul class="nav-links">
+            {% if session.get('user_id') %}
+            <li><a href="/dashboard" class="{{ 'active' if active_page == 'dashboard' }}">Dashboard</a></li>
+            {% else %}
             <li><a href="/" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
             <li><a href="/features" class="{{ 'active' if active_page == 'features' }}">Features</a></li>
+            {% endif %}
             <li><a href="/about" class="{{ 'active' if active_page == 'about' }}">About</a></li>
             <li><a href="/contact" class="{{ 'active' if active_page == 'contact' }}">Contact</a></li>
         </ul>
         <div class="nav-actions">
+            {% if session.get('user_id') %}
+            <a href="/logout" class="btn-ghost">Sign out</a>
+            {% else %}
             <a href="/login" class="btn-ghost">Sign In</a>
             <a href="/register" class="btn-primary">Get Started</a>
+            {% endif %}
         </div>
     </nav>
 
@@ -328,7 +291,7 @@
         <div class="footer-inner">
             <div class="footer-top">
                 <div class="footer-brand">
-                    <a href="/" class="footer-brand-logo">
+                    <a href="{{ '/dashboard' if session.get('user_id') else '/' }}" class="footer-brand-logo">
                         <div class="footer-brand-icon">📚</div>
                         Libra<span>Space</span>
                     </a>
@@ -341,8 +304,12 @@
                 <div class="footer-col">
                     <div class="footer-col-title">Navigate</div>
                     <ul>
+                        {% if session.get('user_id') %}
+                        <li><a href="/dashboard">Dashboard</a></li>
+                        {% else %}
                         <li><a href="/">Home</a></li>
                         <li><a href="/features">Features</a></li>
+                        {% endif %}
                         <li><a href="/about">About</a></li>
                         <li><a href="/contact">Contact</a></li>
                     </ul>
@@ -350,34 +317,18 @@
                 <div class="footer-col">
                     <div class="footer-col-title">Account</div>
                     <ul>
+                        {% if session.get('user_id') %}
+                        <li><a href="/dashboard">Browse Books</a></li>
+                        <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/orders">My Orders</a></li>
+                        <li><a href="/logout">Sign out</a></li>
+                        {% else %}
                         <li><a href="/login">Sign In</a></li>
                         <li><a href="/register">Sign Up</a></li>
                         <li><a href="/dashboard">Browse Books</a></li>
                         <li><a href="/profile">My Profile</a></li>
+                        {% endif %}
                     </ul>
-                </div>
-                <div class="footer-col">
-                    <div class="footer-col-title">Legal</div>
-                    <ul>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Terms of Service</a></li>
-                        <li><a href="/contact">Support</a></li>
-                        <li><a href="#">Cookie Policy</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-divider"></div>
-            <div class="footer-bottom">
-                <div class="footer-copy">© 2025 <strong>LibraSpace</strong> — Crafted for book lovers.</div>
-                <div class="footer-socials">
-                    <a href="#" class="footer-social" title="Twitter">𝕏</a>
-                    <a href="#" class="footer-social" title="GitHub">⌥</a>
-                    <a href="#" class="footer-social" title="Email">✉</a>
-                </div>
-                <div class="footer-legal">
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms</a>
-                    <a href="/contact">Support</a>
                 </div>
             </div>
         </div>

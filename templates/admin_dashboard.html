@@ -181,12 +181,9 @@
                 <a href="/admin/users" class="sidebar-link">
                     <span class="sidebar-icon">👥</span> Users
                 </a>
-                <a href="/admin/reservations" class="sidebar-link">
-                    <span class="sidebar-icon">🔖</span> Reservations
-                </a>
-                <div class="sidebar-section">Account</div>
-                <a href="/admin/logout" class="sidebar-link">
-                    <span class="sidebar-icon">🚪</span> Sign Out
+                <a href="/admin/contact-messages" class="sidebar-link" id="sidebarMsgLink" style="position:relative;">
+                    <span class="sidebar-icon">✉️</span> Messages
+                    <span id="sidebarMsgBadge" style="display:none;min-width:18px;height:18px;background:#ef4444;color:#fff;font-size:0.62rem;font-weight:700;border-radius:100px;display:none;align-items:center;justify-content:center;padding:0 4px;margin-left:auto;"></span>
                 </a>
             </div>
         </aside>
@@ -232,13 +229,6 @@
                     <div>
                         <div class="stat-value">{{ total_users }}</div>
                         <div class="stat-label">Registered Users</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon purple">🔖</div>
-                    <div>
-                        <div class="stat-value">{{ total_bookings }}</div>
-                        <div class="stat-label">Active Reservations</div>
                     </div>
                 </div>
             </div>
@@ -371,9 +361,9 @@
 
     <div class="notif-popup" id="notifPopup">
         <button class="notif-close" id="notifClose">✕</button>
-        <div class="notif-popup-title">🔔 New Order!</div>
-        <div class="notif-popup-msg" id="notifMsg">You have pending orders waiting for review.</div>
-        <a href="/admin/orders" class="notif-popup-link">View Orders →</a>
+        <div class="notif-popup-title" id="notifTitle">🔔 Notification</div>
+        <div class="notif-popup-msg" id="notifMsg"></div>
+        <a href="#" class="notif-popup-link" id="notifLink">View →</a>
     </div>
 
     <script>
@@ -382,27 +372,79 @@
         const btn   = document.getElementById('notifBtn');
         const close = document.getElementById('notifClose');
         const msg   = document.getElementById('notifMsg');
-        let lastCount = 0;
-        function checkOrders() {
-            fetch('/admin/orders/pending-count')
-                .then(r => r.json())
-                .then(data => {
-                    const count = data.count || 0;
-                    if (count > 0) {
-                        badge.style.display = 'flex';
-                        badge.textContent = count;
-                        if (count > lastCount) {
-                            msg.textContent = `You have ${count} pending order${count > 1 ? 's' : ''} waiting for review.`;
-                            popup.style.display = 'block';
-                        }
-                    } else { badge.style.display = 'none'; }
-                    lastCount = count;
-                }).catch(() => {});
+        const notifTitle = document.getElementById('notifTitle');
+        const notifLink  = document.getElementById('notifLink');
+        const sidebarMsgBadge = document.getElementById('sidebarMsgBadge');
+        let lastOrders = 0, lastMsgs = 0;
+
+        function checkNotifications() {
+            Promise.all([
+                fetch('/admin/orders/pending-count').then(r => r.json()).catch(() => ({count:0})),
+                fetch('/admin/contact-messages/unread-count').then(r => r.json()).catch(() => ({count:0}))
+            ]).then(([orders, msgs]) => {
+                const oCount = orders.count || 0;
+                const mCount = msgs.count || 0;
+                const total = oCount + mCount;
+
+                // Bell badge
+                if (total > 0) { badge.style.display = 'flex'; badge.textContent = total; }
+                else { badge.style.display = 'none'; }
+
+                // Sidebar messages badge
+                if (mCount > 0) { sidebarMsgBadge.style.display = 'flex'; sidebarMsgBadge.textContent = mCount; }
+                else { sidebarMsgBadge.style.display = 'none'; }
+
+                // Auto-popup on new items
+                if (mCount > lastMsgs) {
+                    notifTitle.textContent = '✉️ New Message!';
+                    msg.textContent = `You have ${mCount} unread contact message${mCount > 1 ? 's' : ''}.`;
+                    notifLink.href = '/admin/contact-messages';
+                    notifLink.textContent = 'View Messages →';
+                    popup.style.display = 'block';
+                } else if (oCount > lastOrders) {
+                    notifTitle.textContent = '🔔 New Order!';
+                    msg.textContent = `You have ${oCount} pending order${oCount > 1 ? 's' : ''} waiting for review.`;
+                    notifLink.href = '/admin/orders';
+                    notifLink.textContent = 'View Orders →';
+                    popup.style.display = 'block';
+                }
+                lastOrders = oCount;
+                lastMsgs = mCount;
+            });
         }
-        btn.addEventListener('click', e => { e.preventDefault(); popup.style.display = popup.style.display === 'block' ? 'none' : 'block'; });
+
+        btn.addEventListener('click', e => {
+            e.preventDefault();
+            if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+            // Show summary when manually clicked
+            Promise.all([
+                fetch('/admin/orders/pending-count').then(r => r.json()).catch(() => ({count:0})),
+                fetch('/admin/contact-messages/unread-count').then(r => r.json()).catch(() => ({count:0}))
+            ]).then(([orders, msgs]) => {
+                const oCount = orders.count || 0;
+                const mCount = msgs.count || 0;
+                if (mCount > 0) {
+                    notifTitle.textContent = '✉️ Unread Messages';
+                    msg.textContent = `${mCount} unread message${mCount>1?'s':''} and ${oCount} pending order${oCount!==1?'s':''}.`;
+                    notifLink.href = '/admin/contact-messages';
+                    notifLink.textContent = 'View Messages →';
+                } else if (oCount > 0) {
+                    notifTitle.textContent = '🔔 Pending Orders';
+                    msg.textContent = `${oCount} pending order${oCount>1?'s':''} waiting for review.`;
+                    notifLink.href = '/admin/orders';
+                    notifLink.textContent = 'View Orders →';
+                } else {
+                    notifTitle.textContent = '✅ All Clear';
+                    msg.textContent = 'No pending orders or unread messages.';
+                    notifLink.href = '/admin/dashboard';
+                    notifLink.textContent = 'Go to Dashboard →';
+                }
+                popup.style.display = 'block';
+            });
+        });
         close.addEventListener('click', () => popup.style.display = 'none');
-        checkOrders();
-        setInterval(checkOrders, 30000);
+        checkNotifications();
+        setInterval(checkNotifications, 30000);
     </script>
 
 </body>

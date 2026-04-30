@@ -19,26 +19,9 @@
 
         .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
 
-        nav { position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 60px; background: rgba(10,22,40,0.97); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px); }
-        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .nav-logo-icon { width: 28px; height: 28px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-        .nav-logo span { color: var(--gold); }
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .nav-user { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 5px 12px; font-size: 0.8rem; color: var(--text-soft); }
-        .nav-btn { padding: 6px 14px; background: transparent; border: 1px solid var(--border2); border-radius: 6px; color: var(--text-soft); font-size: 0.8rem; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; }
-        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
-
         .layout { display: flex; flex: 1; position: relative; z-index: 1; }
 
-        .sidebar { width: 220px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); padding: 24px 14px; display: flex; flex-direction: column; gap: 4px; position: fixed; top: 60px; left: 0; height: calc(100vh - 60px); overflow-y: auto; z-index: 5; }
-        .sidebar-label { font-size: 0.65rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 0 10px; margin-bottom: 6px; margin-top: 14px; }
-        .sidebar-label:first-child { margin-top: 0; }
-        .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; font-size: 0.83rem; color: var(--text-soft); text-decoration: none; transition: all 0.2s; font-weight: 500; }
-        .sidebar-link:hover { background: var(--surface2); color: var(--text); }
-        .sidebar-link.active { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
-        .sidebar-icon { font-size: 1rem; width: 20px; text-align: center; }
-
-        main { flex: 1; padding: 36px 40px; position: relative; z-index: 1; max-width: 860px; margin-left: 220px; }
+        main { flex: 1; padding: 36px 40px; position: relative; z-index: 1; max-width: 860px; }
 
         /* PROFILE HEADER */
         .profile-header {
@@ -149,31 +132,20 @@
         .btn-danger:hover { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.6); }
 
         /* FOOTER */
-        footer { position: relative; z-index: 1; margin-top: 40px; background: var(--surface); border-top: 1px solid var(--border); padding: 48px 40px 28px; }
-        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 30px; }
-        .footer-brand { max-width: 260px; }
-        .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .footer-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
-        .footer-col h4 { font-size: 0.75rem; font-weight: 600; color: var(--text-soft); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .footer-col ul a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-        .footer-col ul a:hover { color: var(--gold); }
-        .footer-bottom { border-top: 1px solid var(--border); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        footer { position: relative; z-index: 1; margin-top: 40px; background: var(--surface); border-top: 1px solid var(--border); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
-        .footer-bottom-links { display: flex; gap: 20px; }
-        .footer-bottom-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-        .footer-bottom-links a:hover { color: var(--gold); }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
 
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 900px) {
-            .sidebar { display: none; }
             main { padding: 24px 20px; margin-left: 0; }
             .cards-grid { grid-template-columns: 1fr; }
             .danger-card { flex-direction: column; gap: 16px; align-items: flex-start; }
             footer { padding: 36px 24px 20px; }
             .footer-top { flex-direction: column; }
-            .footer-bottom { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -181,36 +153,10 @@
 
     <div class="grid-bg"></div>
 
-    <nav>
-        <a href="/dashboard" class="nav-logo">
-            <div class="nav-logo-icon">📚</div>
-            Libra<span>Space</span>
-        </a>
-        <div class="nav-right">
-            <div class="nav-user">👤 {{ username }}</div>
-            <a href="/logout" class="nav-btn">Sign out</a>
-        </div>
-    </nav>
+    {% include '_navbar.html' %}
 
-    <div class="layout">
-
-        <aside class="sidebar">
-            <div class="sidebar-label">Browse</div>
-            <a href="/dashboard" class="sidebar-link">
-                <span class="sidebar-icon">📚</span> All Books
-            </a>
-            <a href="/cart" class="sidebar-link">
-                <span class="sidebar-icon">🛒</span> Cart
-            </a>
-            <a href="/orders" class="sidebar-link">
-                <span class="sidebar-icon">📦</span> My Orders
-            </a>
-            <div class="sidebar-label">Account</div>
-            <a href="/profile" class="sidebar-link active">
-                <span class="sidebar-icon">👤</span> My Profile
-            </a>
-        </aside>
-
+    {% set active_page = 'profile' %}
+    {% include '_sidebar.html' %}
         <main>
 
             <!-- PROFILE HEADER -->
@@ -364,50 +310,8 @@
             </div>
 
         </main>
-    </div>
-
-    <footer>
-        <div class="footer-top">
-            <div class="footer-brand">
-                <div class="footer-logo">📚 LibraSpace</div>
-                <div class="footer-desc">A modern online book store built to make buying books more accessible and enjoyable for everyone.</div>
-            </div>
-            <div class="footer-col">
-                <h4>Shop</h4>
-                <ul>
-                    <li><a href="/dashboard">All Books</a></li>
-                    <li><a href="/cart">My Cart</a></li>
-                    <li><a href="/orders">My Orders</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Company</h4>
-                <ul>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/features">Features</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Support</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
-            <div class="footer-bottom-links">
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-                <a href="#">Support</a>
-            </div>
-        </div>
-    </footer>
-
-    <script>
+    </div></div>
+<script>
         function checkStrength(val) {
             const segs = ['seg1','seg2','seg3','seg4'].map(id => document.getElementById(id));
             const label = document.getElementById('strength-label');

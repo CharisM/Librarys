@@ -35,49 +35,8 @@
             background-size: 60px 60px;
         }
 
-        nav {
-            position: relative; z-index: 10;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; height: 64px;
-            background: rgba(10,22,40,0.95);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-        }
 
-        .nav-logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.2rem; font-weight: 700;
-            color: var(--text); text-decoration: none;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .nav-logo-icon {
-            width: 28px; height: 28px; background: var(--gold);
-            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
-        }
-
-        .nav-logo span { color: var(--gold); }
-
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-
-        .nav-user {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--surface2); border: 1px solid var(--border2);
-            border-radius: 6px; padding: 6px 14px;
-            font-size: 0.82rem; color: var(--text-soft);
-        }
-
-        .nav-btn {
-            padding: 7px 16px; background: transparent;
-            border: 1px solid var(--border2); border-radius: 6px;
-            color: var(--text-soft); font-size: 0.82rem;
-            font-family: 'Inter', sans-serif; cursor: pointer;
-            text-decoration: none; transition: all 0.2s;
-        }
-
-        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-        main { flex: 1; padding: 36px 40px; max-width: 1280px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+        main { flex: 1; padding: 36px 40px; max-width: 1280px; position: relative; z-index: 1; }
 
         .page-header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
         .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text); }
@@ -180,9 +139,8 @@
             position: relative; z-index: 1; margin-top: 40px;
             background: var(--surface); border-top: 1px solid var(--border);
             padding: 20px 40px;
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
         }
-
         .footer-logo { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; color: var(--gold); }
         .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
         .footer-links { display: flex; gap: 20px; }
@@ -191,7 +149,7 @@
 
         @media (max-width: 768px) {
             nav { padding: 0 20px; }
-            main { padding: 24px 20px; }
+            main { padding: 24px 20px; margin-left: 0; }
             footer { flex-direction: column; gap: 10px; text-align: center; }
         }
     </style>
@@ -200,19 +158,11 @@
 
     <div class="grid-bg"></div>
 
-    <nav>
-        <a href="/dashboard" class="nav-logo">
-            <div class="nav-logo-icon">📚</div>
-            Libra<span>Space</span>
-        </a>
-        <div class="nav-right">
-            <a href="/dashboard" class="nav-btn">← Dashboard</a>
-            <div class="nav-user">👤 {{ username }}</div>
-            <a href="/logout" class="nav-btn">Sign out</a>
-        </div>
-    </nav>
+    {% include '_navbar.html' %}
 
-    <main>
+    {% set active_page = 'reservations' %}
+    {% include '_sidebar.html' %}
+        <main>
         <div class="page-header">
             <div class="page-title">My <span>Reservations</span></div>
             <div class="page-sub">{{ reserved_books | length }} book{{ 's' if reserved_books | length != 1 }} reserved — cancel anytime.</div>
@@ -252,19 +202,9 @@
             <a href="/dashboard">Browse Books</a>
         </div>
         {% endif %}
-    </main>
-
-    <footer>
-        <div class="footer-logo">📚 LibraSpace</div>
-        <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
-        <div class="footer-links">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="/about">About</a>
-        </div>
-    </footer>
-
-    <div style="position:fixed;inset:0;z-index:99999;background:rgba(10,22,40,0.7);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);" id="resConfirmOverlay">
+        </main>
+    </div></div>
+<div style="position:fixed;inset:0;z-index:99999;background:rgba(10,22,40,0.7);display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);" id="resConfirmOverlay">
         <div style="background:#0d1b35;border:1px solid #1f3660;border-radius:12px;padding:28px 32px;text-align:center;min-width:280px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
             <div style="font-size:0.92rem;color:#e8edf5;margin-bottom:20px;" id="resConfirmMsg"></div>
             <div style="display:flex;gap:10px;justify-content:center;">

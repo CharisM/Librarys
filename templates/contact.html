@@ -123,6 +123,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shado
 
 .alert { border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; font-size: 0.875rem; }
 .alert-success { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.25); color: #bbf7d0; }
+.alert-error { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); color: #fecaca; }
 
 /* SUCCESS STATE */
 .success-state {
@@ -210,20 +211,24 @@ input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shado
             <div class="form-card-title">Send a Message</div>
             <div class="form-card-sub">Fill out the form below and we'll respond as soon as possible.</div>
 
+            {% if error %}
+            <div class="alert alert-error">{{ error }}</div>
+            {% endif %}
+
             <form method="POST">
                 <div class="form-row">
                     <div class="form-group">
                         <label>Full Name</label>
                         <div class="input-wrap">
                             <span class="input-icon">👤</span>
-                            <input type="text" name="name" placeholder="Your name" required>
+                            <input type="text" name="name" placeholder="Your name" value="{{ form.name if form else '' }}" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Email</label>
                         <div class="input-wrap">
                             <span class="input-icon">📧</span>
-                            <input type="email" name="email" placeholder="your@email.com" required>
+                            <input type="email" name="email" placeholder="your@email.com" value="{{ form.email if form else '' }}" required>
                         </div>
                     </div>
                 </div>
@@ -233,11 +238,11 @@ input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shado
                     <div class="input-wrap">
                         <span class="input-icon">📋</span>
                         <select name="subject">
-                            <option value="General Inquiry">General Inquiry</option>
-                            <option value="Order Issue">Order Issue</option>
-                            <option value="Account Help">Account Help</option>
-                            <option value="Book Request">Book Request</option>
-                            <option value="Feedback">Feedback</option>
+                            <option value="General Inquiry" {{ 'selected' if form and form.subject == 'General Inquiry' else '' }}>General Inquiry</option>
+                            <option value="Order Issue" {{ 'selected' if form and form.subject == 'Order Issue' else '' }}>Order Issue</option>
+                            <option value="Account Help" {{ 'selected' if form and form.subject == 'Account Help' else '' }}>Account Help</option>
+                            <option value="Book Request" {{ 'selected' if form and form.subject == 'Book Request' else '' }}>Book Request</option>
+                            <option value="Feedback" {{ 'selected' if form and form.subject == 'Feedback' else '' }}>Feedback</option>
                         </select>
                     </div>
                 </div>
@@ -246,7 +251,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shado
                     <label>Message</label>
                     <div class="input-wrap">
                         <span class="input-icon top">💬</span>
-                        <textarea name="message" placeholder="Write your message here..." required minlength="10"></textarea>
+                        <textarea name="message" placeholder="Write your message here..." required minlength="10">{{ form.message if form else '' }}</textarea>
                     </div>
                 </div>
 

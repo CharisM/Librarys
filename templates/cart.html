@@ -15,16 +15,8 @@
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
         .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
-        nav { position: relative; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; height: 64px; background: rgba(10,22,40,0.95); border-bottom: 1px solid var(--border); backdrop-filter: blur(20px); }
-        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .nav-logo-icon { width: 28px; height: 28px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-        .nav-logo span { color: var(--gold); }
-        .nav-right { display: flex; align-items: center; gap: 10px; }
-        .nav-user { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; padding: 6px 14px; font-size: 0.82rem; color: var(--text-soft); }
-        .nav-btn { padding: 7px 16px; background: transparent; border: 1px solid var(--border2); border-radius: 6px; color: var(--text-soft); font-size: 0.82rem; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.2s; }
-        .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-        main { flex: 1; padding: 40px; max-width: 900px; margin: 0 auto; width: 100%; position: relative; z-index: 1; }
+        main { flex: 1; padding: 40px 40px 40px; max-width: 860px; position: relative; z-index: 1; }
 
         .page-header { margin-bottom: 32px; }
         .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text); }
@@ -101,45 +93,27 @@
         .empty-state a { padding: 12px 28px; background: var(--gold); border-radius: 6px; color: #0a1628; font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: all 0.2s; }
         .empty-state a:hover { background: var(--gold-light); }
 
-        footer { position: relative; z-index: 1; margin-top: 40px; background: var(--surface); border-top: 1px solid var(--border); padding: 48px 40px 28px; }
-        .footer-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 30px; }
-        .footer-brand { max-width: 260px; }
-        .footer-logo { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .footer-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; }
-        .footer-col h4 { font-size: 0.75rem; font-weight: 600; color: var(--text-soft); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .footer-col ul a { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-        .footer-col ul a:hover { color: var(--gold); }
-        .footer-bottom { border-top: 1px solid var(--border); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        footer { position: relative; z-index: 1; margin-top: 40px; background: var(--surface); border-top: 1px solid var(--border); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .footer-copy { font-size: 0.78rem; color: var(--text-muted); }
-        .footer-bottom-links { display: flex; gap: 20px; }
-        .footer-bottom-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-        .footer-bottom-links a:hover { color: var(--gold); }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { font-size: 0.78rem; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
 
-        @media (max-width: 768px) {
-            main { padding: 24px 20px; }
+        @media (max-width: 900px) {
+            main { padding: 24px 20px; margin-left: 0; }
             .cart-layout { grid-template-columns: 1fr; }
             footer { padding: 36px 24px 20px; }
             .footer-top { flex-direction: column; }
-            .footer-bottom { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
-    <nav>
-        <a href="/dashboard" class="nav-logo">
-            <div class="nav-logo-icon">📚</div>
-            Libra<span>Space</span>
-        </a>
-        <div class="nav-right">
-            <a href="/dashboard" class="nav-btn">← Shop</a>
-            <div class="nav-user">👤 {{ username }}</div>
-            <a href="/logout" class="nav-btn">Sign out</a>
-        </div>
-    </nav>
+    {% include '_navbar.html' %}
 
-    <main>
+    {% set active_page = 'cart' %}
+    {% include '_sidebar.html' %}
+        <main>
         <div class="page-header">
             <div class="page-title">Your <span>Cart</span></div>
             <div class="page-sub">{{ cart_books | length }} item{{ 's' if cart_books | length != 1 }}</div>
@@ -189,47 +163,7 @@
             <a href="/dashboard">Browse Books</a>
         </div>
         {% endif %}
-    </main>
-
-    <footer>
-        <div class="footer-top">
-            <div class="footer-brand">
-                <div class="footer-logo">📚 LibraSpace</div>
-                <div class="footer-desc">A modern online book store built to make buying books more accessible and enjoyable for everyone.</div>
-            </div>
-            <div class="footer-col">
-                <h4>Shop</h4>
-                <ul>
-                    <li><a href="/dashboard">All Books</a></li>
-                    <li><a href="/cart">My Cart</a></li>
-                    <li><a href="/orders">My Orders</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Company</h4>
-                <ul>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/features">Features</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Support</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-copy">© 2025 LibraSpace. All rights reserved.</div>
-            <div class="footer-bottom-links">
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
-                <a href="#">Support</a>
-            </div>
-        </div>
-    </footer>
+        </main>
+    </div></div>
 </body>
 </html>

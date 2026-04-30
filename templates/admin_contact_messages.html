@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LibraSpace — User Orders</title>
+    <title>LibraSpace — Contact Messages</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,22 +49,31 @@
         .sidebar-link.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 60%; background: var(--gold); border-radius: 0 3px 3px 0; }
         .sidebar-icon { font-size: 0.95rem; width: 20px; text-align: center; flex-shrink: 0; }
         main { flex: 1; margin-left: 230px; padding: 28px 32px; overflow-x: hidden; }
-        .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-muted); text-decoration: none; margin-bottom: 20px; transition: color 0.2s; }
-        .back-link:hover { color: var(--gold); }
         .page-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
         .page-title span { color: var(--gold); }
         .page-sub { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; }
-        .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        thead { background: var(--surface2); }
-        th { padding: 12px 16px; text-align: left; font-size: 0.68rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
-        td { padding: 13px 16px; font-size: 0.83rem; border-top: 1px solid var(--border); vertical-align: middle; }
-        tr:hover td { background: rgba(201,168,76,0.02); }
-        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
-        .status-pending   { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3);  color: #fde68a; }
-        .status-shipped   { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3);  color: #93c5fd; }
-        .status-delivered { background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3);  color: #86efac; }
-        .status-cancelled { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+
+        .msg-list { display: flex; flex-direction: column; gap: 12px; }
+        .msg-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px 24px;
+            transition: border-color 0.2s;
+        }
+        .msg-card.unread { border-color: rgba(201,168,76,0.35); background: rgba(201,168,76,0.03); }
+        .msg-card:hover { border-color: var(--border2); }
+        .msg-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 10px; }
+        .msg-meta { display: flex; flex-direction: column; gap: 3px; }
+        .msg-name { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+        .msg-email { font-size: 0.78rem; color: var(--text-muted); }
+        .msg-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .msg-date { font-size: 0.72rem; color: var(--text-muted); }
+        .unread-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; flex-shrink: 0; }
+        .msg-subject { font-size: 0.78rem; font-weight: 600; color: var(--gold); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+        .msg-body { font-size: 0.85rem; color: var(--text-soft); line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+        .msg-footer { margin-top: 14px; display: flex; justify-content: flex-end; }
+        .btn-read { padding: 6px 16px; background: transparent; border: 1px solid rgba(74,222,128,0.3); border-radius: 7px; color: #86efac; font-size: 0.75rem; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; }
+        .btn-read:hover { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.6); }
+        .read-label { font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
         .empty { text-align: center; padding: 60px; color: var(--text-muted); font-size: 0.9rem; }
         @media (max-width: 900px) { .sidebar { display: none; } main { margin-left: 0; padding: 20px 16px; } }
     </style>
@@ -99,51 +108,45 @@
                 <a href="/admin/dashboard" class="sidebar-link"><span class="sidebar-icon">📊</span> Dashboard</a>
                 <a href="/admin" class="sidebar-link"><span class="sidebar-icon">📚</span> Manage Books</a>
                 <a href="/admin/orders" class="sidebar-link"><span class="sidebar-icon">📦</span> All Orders</a>
-                <a href="/admin/users" class="sidebar-link active"><span class="sidebar-icon">👥</span> Users</a>
-                <a href="/admin/contact-messages" class="sidebar-link"><span class="sidebar-icon">✉️</span> Messages</a>
+                <a href="/admin/users" class="sidebar-link"><span class="sidebar-icon">👥</span> Users</a>
+                <a href="/admin/contact-messages" class="sidebar-link active"><span class="sidebar-icon">✉️</span> Messages</a>
             </div>
         </aside>
         <main>
-            <a href="/admin/users" class="back-link">← Back to Users</a>
-            <div class="page-title">Orders of <span>{{ user_info.username or 'User' }}</span></div>
-            <div class="page-sub">{{ ordered_books | length }} order{{ 's' if ordered_books | length != 1 }} found</div>
-            <div class="table-wrap">
-                {% if ordered_books %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Book</th>
-                            <th>Price</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for book in ordered_books %}
-                        <tr>
-                            <td style="color:var(--text-muted);">{{ book.order_id }}</td>
-                            <td style="font-weight:600;">{{ book.title }}</td>
-                            <td style="color:var(--gold);font-weight:600;">₱{{ "%.2f"|format(book.price|float) }}</td>
-                            <td style="color:var(--text-muted);font-size:0.75rem;">{{ book.ordered_at[:10] if book.ordered_at else '—' }}</td>
-                            <td>
-                                <span class="status-badge status-{{ book.status or 'pending' }}">
-                                    {% set s = book.status or 'pending' %}
-                                    {% if s == 'pending' %}⏳ Pending
-                                    {% elif s == 'shipped' %}🚚 Shipped
-                                    {% elif s == 'delivered' %}✅ Delivered
-                                    {% elif s == 'cancelled' %}✕ Cancelled
-                                    {% else %}{{ s }}{% endif %}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <div class="empty">This user has no orders yet.</div>
-                {% endif %}
+            <div class="page-title">Contact <span>Messages</span></div>
+            <div class="page-sub">{{ messages | length }} message{{ 's' if messages | length != 1 }} — {{ messages | selectattr('is_read', 'equalto', false) | list | length }} unread</div>
+
+            {% if messages %}
+            <div class="msg-list">
+                {% for m in messages %}
+                <div class="msg-card {{ 'unread' if not m.is_read }}">
+                    <div class="msg-header">
+                        <div class="msg-meta">
+                            <div class="msg-name">{{ m.name }}</div>
+                            <div class="msg-email">{{ m.email }}</div>
+                        </div>
+                        <div class="msg-right">
+                            <div class="msg-date">{{ m.created_at[:10] if m.created_at else '—' }}</div>
+                            {% if not m.is_read %}<div class="unread-dot" title="Unread"></div>{% endif %}
+                        </div>
+                    </div>
+                    <div class="msg-subject">{{ m.subject }}</div>
+                    <div class="msg-body">{{ m.message }}</div>
+                    <div class="msg-footer">
+                        {% if not m.is_read %}
+                        <form method="POST" action="/admin/contact-messages/{{ m.id }}/read">
+                            <button type="submit" class="btn-read">✓ Mark as Read</button>
+                        </form>
+                        {% else %}
+                        <div class="read-label">✓ Read</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
+            {% else %}
+            <div class="empty">No contact messages yet.</div>
+            {% endif %}
         </main>
     </div>
 
@@ -153,7 +156,6 @@
         <div class="notif-popup-msg" id="notifMsg"></div>
         <a href="#" class="notif-popup-link" id="notifLink">View →</a>
     </div>
-
     <script>
         (function(){
             const badge=document.getElementById('notifBadge'),popup=document.getElementById('notifPopup'),btn=document.getElementById('notifBtn'),close=document.getElementById('notifClose'),msg=document.getElementById('notifMsg'),title=document.getElementById('notifTitle'),link=document.getElementById('notifLink');
