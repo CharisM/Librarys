@@ -27,7 +27,6 @@
         .book-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
         .book-title { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.4; }
         .book-author, .book-meta { font-size: 0.8rem; color: var(--text-muted); }
-        .book-price { font-size: 1.2rem; font-weight: 800; color: var(--gold); margin-top: 4px; }
         .info-card { padding: 22px; }
         .section-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 14px; }
         .detail-list { display: flex; flex-direction: column; gap: 12px; }
@@ -76,7 +75,6 @@
                     <div class="book-title">{{ book.title }}</div>
                     {% if book.author %}<div class="book-author">by {{ book.author }}</div>{% endif %}
                     {% if book.genre %}<div class="book-meta">{{ book.genre }}</div>{% endif %}
-                    {% if book.price %}<div class="book-price">PHP {{ "%.2f"|format(book.price|float) }}</div>{% endif %}
                 </div>
             </div>
 
@@ -105,6 +103,12 @@
                         <div class="detail-key">Mode of Payment</div>
                         <div class="detail-value">
                             {% if payment == 'GCash' %}GCash{% elif payment == 'COD' %}Cash on Delivery{% else %}Not available{% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-key">Total</div>
+                        <div class="detail-value">
+                            {% if book.price is not none %}PHP {{ "%.2f"|format(book.price|float) }}{% else %}Not available{% endif %}
                         </div>
                     </div>
                     <div class="detail-row">
