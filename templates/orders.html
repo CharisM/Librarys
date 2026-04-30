@@ -298,7 +298,7 @@
                     {% endif %}
                 </div>
                 <div class="book-footer">
-                    <a href="/book/{{ book.id }}" class="view-btn">View</a>
+                    <a href="/order/{{ book.order_id }}" class="view-btn">View</a>
                     {% if (book.status or 'pending') == 'pending' %}
                     <a href="/order/cancel/{{ book.order_id }}" class="cancel-btn" onclick="return silentConfirm(this, 'Cancel this order?')">Cancel</a>
                     {% endif %}

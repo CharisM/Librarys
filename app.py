@@ -5,6 +5,7 @@ import random
 import time
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 from flask_mail import Mail, Message
 
 load_dotenv(dotenv_path=".env")
@@ -20,6 +21,9 @@ app.secret_key = clean_env("SECRET_KEY", "libraspace2025")
 app.config['SESSION_COOKIE_SECURE'] = os.getenv("VERCEL_ENV") is not None
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
+GCASH_PROOF_UPLOAD_DIR = os.path.join(app.root_path, 'static', 'uploads', 'gcash_proofs')
+ALLOWED_GCASH_PROOF_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'pdf'}
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
@@ -47,6 +51,30 @@ HEADERS = {
 HTTP = requests.Session()
 HTTP.trust_env = False
 HTTP.verify = False
+
+
+def allowed_gcash_proof(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_GCASH_PROOF_EXTENSIONS
+
+
+def save_gcash_proof(user_id):
+    proof = request.files.get('gcash_proof')
+    if not proof or not proof.filename:
+        return None, 'Please upload your GCash payment proof before placing the order.'
+    if not allowed_gcash_proof(proof.filename):
+        return None, 'GCash proof must be a PNG, JPG, WEBP, or PDF file.'
+
+    os.makedirs(GCASH_PROOF_UPLOAD_DIR, exist_ok=True)
+    filename = secure_filename(proof.filename)
+    _, ext = os.path.splitext(filename)
+    saved_name = f"user{user_id}_{int(time.time())}_{random.randint(1000, 9999)}{ext.lower()}"
+    save_path = os.path.join(GCASH_PROOF_UPLOAD_DIR, saved_name)
+    try:
+        proof.save(save_path)
+    except Exception as e:
+        print('GCash proof upload error:', e)
+        return None, 'Could not upload your GCash proof right now. Please try again.'
+    return f"/static/uploads/gcash_proofs/{saved_name}", None
 
 DEFAULT_BOOK_IMAGES = {
     "the notebook": "/static/img/THENOTEBOOK.jpg",
@@ -199,6 +227,39 @@ def db_post(table, data):
         raise
 
 
+def create_order(user_id, book_id, street='', location='', payment='', proof_url=None):
+    order_data = {'user_id': user_id, 'book_id': book_id}
+    if street or location or payment:
+        order_data.update({
+            'street': street,
+            'location': location,
+            'payment': payment
+        })
+    if proof_url:
+        order_data['payment_proof_url'] = proof_url
+    try:
+        return db_post('orders', order_data)
+    except Exception as e:
+        print('create_order with details failed, retrying basic order:', e)
+        return db_post('orders', {'user_id': user_id, 'book_id': book_id})
+
+
+def remember_order_details(order_result, street, location, payment):
+    if not order_result:
+        return
+    order_id = order_result[0].get('id') if isinstance(order_result, list) and order_result else None
+    if not order_id:
+        return
+    details = session.get('order_details', {})
+    details[str(order_id)] = {
+        'street': street,
+        'location': location,
+        'payment': payment
+    }
+    session['order_details'] = details
+    session.modified = True
+
+
 def db_patch(table, data, params=None):
     config_error = supabase_config_error()
     if config_error:
@@ -321,7 +382,7 @@ def home():
         books = apply_book_images(db_get('books'))
     except Exception:
         books = []
-    return render_template('index.html', active_page='home', featured_books=books[:6])
+    return render_template('index.html', active_page='home', featured_books=books[:10], force_guest_nav=True)
 
 @app.route('/features')
 def features():
@@ -451,6 +512,7 @@ def login():
                     # upgrade to hashed
                     db_patch('users', {'password': generate_password_hash(password)}, {'id': f"eq.{users[0]['id']}"})
             if matched:
+                session.clear()
                 session['user_id'] = users[0]['id']
                 session.modified = True
                 return redirect('/dashboard')
@@ -988,6 +1050,14 @@ def cart_checkout_place():
         return render_template('cart_checkout.html', cart_books=cart_books, total=total,
             username=username, error='Please fill in all delivery details and select a payment method.',
             form={'street': street, 'location': location, 'payment': payment})
+    proof_url = None
+    if payment == 'GCash':
+        proof_url, proof_error = save_gcash_proof(session['user_id'])
+        if proof_error:
+            total = round(sum(float(b.get('price') or 0) for b in cart_books), 2)
+            return render_template('cart_checkout.html', cart_books=cart_books, total=total,
+                username=username, error=proof_error,
+                form={'street': street, 'location': location, 'payment': payment})
     for book_id in cart_ids:
         try:
             book = db_get('books', {'id': f'eq.{book_id}'})
@@ -996,7 +1066,8 @@ def cart_checkout_place():
             already = db_get('orders', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
             if already:
                 continue
-            db_post('orders', {'user_id': session['user_id'], 'book_id': book_id})
+            order_result = create_order(session['user_id'], book_id, street, location, payment, proof_url)
+            remember_order_details(order_result, street, location, payment)
             db_patch('books', {'stock': int(book[0]['stock']) - 1}, {'id': f'eq.{book_id}'})
         except Exception as e:
             print('Cart place error:', e)
@@ -1038,6 +1109,15 @@ def buy_place(book_id):
         return render_template('checkout.html', book=book_result[0] if book_result else {}, username=username,
             error='Please fill in all delivery details and select a payment method.',
             form={'street': street, 'location': location, 'payment': payment})
+    proof_url = None
+    if payment == 'GCash':
+        proof_url, proof_error = save_gcash_proof(session['user_id'])
+        if proof_error:
+            user = db_get('users', {'id': f"eq.{session['user_id']}"})
+            username = user[0]['username'] if user else 'Reader'
+            return render_template('checkout.html', book=book_result[0] if book_result else {}, username=username,
+                error=proof_error,
+                form={'street': street, 'location': location, 'payment': payment})
     if not book_result or int(book_result[0].get('stock') or 0) <= 0:
         return redirect(f'/book/{book_id}?out_of_stock=1')
     try:
@@ -1050,7 +1130,8 @@ def buy_place(book_id):
     if not book or int(book[0].get('stock') or 0) <= 0:
         return redirect(f'/book/{book_id}?out_of_stock=1')
     try:
-        db_post('orders', {'user_id': session['user_id'], 'book_id': book_id})
+        order_result = create_order(session['user_id'], book_id, street, location, payment, proof_url)
+        remember_order_details(order_result, street, location, payment)
         db_patch('books', {'stock': int(book[0]['stock']) - 1}, {'id': f'eq.{book_id}'})
         existing_booking = db_get('bookings', {'user_id': f"eq.{session['user_id']}", 'book_id': f'eq.{book_id}'})
         if existing_booking:
@@ -1097,6 +1178,9 @@ def orders():
                     entry['order_id'] = order['id']
                     entry['ordered_at'] = order.get('created_at', '')
                     entry['status'] = order.get('status', 'pending')
+                    entry['street'] = order.get('street', '')
+                    entry['location'] = order.get('location', '')
+                    entry['payment'] = order.get('payment', '')
                     ordered_books.append(entry)
             except Exception as e:
                 print('Orders row error:', e)
@@ -1106,6 +1190,43 @@ def orders():
     except Exception as e:
         print('Orders error:', e)
         return render_template('orders.html', ordered_books=[], username='Reader', cart_count=0, genres=[], selected_genre=None)
+
+
+@app.route('/order/<int:order_id>')
+def order_detail(order_id):
+    if 'user_id' not in session:
+        return redirect('/login')
+    try:
+        user = db_get('users', {'id': f"eq.{session['user_id']}"})
+        user_info = user[0] if user else {}
+        username = user_info.get('username', 'Reader')
+        order_rows = db_get('orders', {'id': f'eq.{order_id}', 'user_id': f"eq.{session['user_id']}"})
+        if not order_rows:
+            return redirect('/orders')
+        order = order_rows[0]
+        book_rows = apply_book_images(db_get('books', {'id': f"eq.{order['book_id']}"}))
+        if not book_rows:
+            return redirect('/orders')
+        book = book_rows[0]
+        remembered_details = session.get('order_details', {}).get(str(order_id), {})
+        for key in ('street', 'location', 'payment'):
+            if not order.get(key) and remembered_details.get(key):
+                order[key] = remembered_details[key]
+        cart_count = len(get_cart_ids(session['user_id']))
+        genres = sorted(set(b.get('genre') for b in apply_book_images(db_get('books')) if b.get('genre')))
+        return render_template(
+            'order_detail.html',
+            order=order,
+            book=book,
+            username=username,
+            user_info=user_info,
+            cart_count=cart_count,
+            genres=genres,
+            selected_genre=None
+        )
+    except Exception as e:
+        print('Order detail error:', e)
+        return redirect('/orders')
 
 
 @app.route('/order/cancel/<int:order_id>')

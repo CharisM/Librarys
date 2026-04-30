@@ -252,18 +252,19 @@
     </style>
 </head>
 <body>
+    {% set show_user_nav = session.get('user_id') and not force_guest_nav|default(false) %}
 
     <div class="grid-bg"></div>
     <div class="glow glow-1"></div>
     <div class="glow glow-2"></div>
 
     <nav>
-        <a href="{{ '/dashboard' if session.get('user_id') else '/' }}" class="nav-logo">
+        <a href="{{ '/dashboard' if show_user_nav else '/' }}" class="nav-logo">
             <div class="nav-logo-icon">📚</div>
             Libra<span>Space</span>
         </a>
         <ul class="nav-links">
-            {% if session.get('user_id') %}
+            {% if show_user_nav %}
             <li><a href="/dashboard" class="{{ 'active' if active_page == 'dashboard' }}">Dashboard</a></li>
             {% else %}
             <li><a href="/" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
@@ -273,7 +274,7 @@
             <li><a href="/contact" class="{{ 'active' if active_page == 'contact' }}">Contact</a></li>
         </ul>
         <div class="nav-actions">
-            {% if session.get('user_id') %}
+            {% if show_user_nav %}
             <a href="/logout" class="btn-ghost">Sign out</a>
             {% else %}
             <a href="/login" class="btn-ghost">Sign In</a>
@@ -291,7 +292,7 @@
         <div class="footer-inner">
             <div class="footer-top">
                 <div class="footer-brand">
-                    <a href="{{ '/dashboard' if session.get('user_id') else '/' }}" class="footer-brand-logo">
+                    <a href="{{ '/dashboard' if show_user_nav else '/' }}" class="footer-brand-logo">
                         <div class="footer-brand-icon">📚</div>
                         Libra<span>Space</span>
                     </a>
@@ -304,7 +305,7 @@
                 <div class="footer-col">
                     <div class="footer-col-title">Navigate</div>
                     <ul>
-                        {% if session.get('user_id') %}
+                        {% if show_user_nav %}
                         <li><a href="/dashboard">Dashboard</a></li>
                         {% else %}
                         <li><a href="/">Home</a></li>
@@ -317,7 +318,7 @@
                 <div class="footer-col">
                     <div class="footer-col-title">Account</div>
                     <ul>
-                        {% if session.get('user_id') %}
+                        {% if show_user_nav %}
                         <li><a href="/dashboard">Browse Books</a></li>
                         <li><a href="/profile">My Profile</a></li>
                         <li><a href="/orders">My Orders</a></li>
@@ -325,8 +326,6 @@
                         {% else %}
                         <li><a href="/login">Sign In</a></li>
                         <li><a href="/register">Sign Up</a></li>
-                        <li><a href="/dashboard">Browse Books</a></li>
-                        <li><a href="/profile">My Profile</a></li>
                         {% endif %}
                     </ul>
                 </div>

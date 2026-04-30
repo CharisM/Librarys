@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraSpace - Order Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a1628; --surface: #0d1b35; --surface2: #111f3e;
+            --border: #1a2d52; --border2: #1f3660;
+            --gold: #c9a84c; --gold-light: #e8c96a;
+            --text: #e8edf5; --text-muted: #6b7a99; --text-soft: #9aa3bc;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+        .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
+        main { flex: 1; padding: 90px 40px 36px; position: relative; z-index: 1; max-width: 980px; }
+        .page-header { margin-bottom: 28px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text); }
+        .page-title span { color: var(--gold); }
+        .page-sub { font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; }
+        .detail-layout { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
+        .book-card, .info-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        .book-cover { width: 100%; aspect-ratio: 3 / 4; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+        .book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .book-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .book-title { font-size: 1rem; font-weight: 700; color: var(--text); line-height: 1.4; }
+        .book-author, .book-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .book-price { font-size: 1.2rem; font-weight: 800; color: var(--gold); margin-top: 4px; }
+        .info-card { padding: 22px; }
+        .section-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 14px; }
+        .detail-list { display: flex; flex-direction: column; gap: 12px; }
+        .detail-row { display: grid; grid-template-columns: 150px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-key { color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.6px; }
+        .detail-value { color: var(--text); font-size: 0.9rem; font-weight: 600; text-align: right; }
+        .status-badge { display:inline-flex; width: fit-content; justify-self: end; padding: 3px 10px; border-radius: 100px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-pending { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3); color: #fde68a; }
+        .status-shipped { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3); color: #93c5fd; }
+        .status-delivered { background: rgba(74,222,128,0.12); border: 1px solid rgba(74,222,128,0.3); color: #86efac; }
+        .status-cancelled { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+        .back-link { display: inline-flex; margin-top: 18px; color: var(--gold); font-size: 0.85rem; font-weight: 700; text-decoration: none; }
+        .back-link:hover { color: var(--gold-light); }
+        @media (max-width: 800px) {
+            main { padding: 82px 20px 28px; margin-left: 0; }
+            .detail-layout { grid-template-columns: 1fr; }
+            .book-cover { aspect-ratio: 16 / 10; }
+            .detail-row { grid-template-columns: 1fr; gap: 5px; }
+            .detail-value { text-align: left; }
+            .status-badge { justify-self: start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    {% include '_navbar.html' %}
+    {% set active_page = 'orders' %}
+    {% include '_sidebar.html' %}
+
+    <main>
+        <div class="page-header">
+            <div class="page-title">Order <span>Details</span></div>
+            <div class="page-sub">Review this purchased item and delivery information.</div>
+        </div>
+
+        <div class="detail-layout">
+            <div class="book-card">
+                <div class="book-cover">
+                    {% set book_image = book.image_url or book.cover_url %}
+                    {% if book_image %}
+                    <img src="{{ book_image }}" alt="{{ book.title }}" onerror="this.style.display='none';this.parentElement.textContent='Book'">
+                    {% else %}Book{% endif %}
+                </div>
+                <div class="book-body">
+                    <div class="book-title">{{ book.title }}</div>
+                    {% if book.author %}<div class="book-author">by {{ book.author }}</div>{% endif %}
+                    {% if book.genre %}<div class="book-meta">{{ book.genre }}</div>{% endif %}
+                    {% if book.price %}<div class="book-price">PHP {{ "%.2f"|format(book.price|float) }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="section-label">Customer & Payment</div>
+                {% set status = order.get('status', 'pending') %}
+                {% set street = order.get('street') %}
+                {% set location = order.get('location') %}
+                {% set payment = order.get('payment') %}
+                <div class="detail-list">
+                    <div class="detail-row">
+                        <div class="detail-key">Name</div>
+                        <div class="detail-value">{{ username }}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-key">Location</div>
+                        <div class="detail-value">
+                            {% if street or location %}
+                                {{ street }}{% if street and location %}, {% endif %}{{ location }}
+                            {% else %}
+                                Not available for this order
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-key">Mode of Payment</div>
+                        <div class="detail-value">
+                            {% if payment == 'GCash' %}GCash{% elif payment == 'COD' %}Cash on Delivery{% else %}Not available{% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-key">Order Status</div>
+                        <div class="detail-value status-badge status-{{ status }}">{{ status }}</div>
+                    </div>
+                    {% if order.get('created_at') %}
+                    <div class="detail-row">
+                        <div class="detail-key">Ordered At</div>
+                        <div class="detail-value">{{ order.created_at[:10] }} at {{ order.created_at[11:16] }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+                <a href="/orders" class="back-link">Back to My Orders</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

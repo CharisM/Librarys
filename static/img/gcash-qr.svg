@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-labelledby="title desc">
+  <title id="title">LibraSpace GCash QR</title>
+  <desc id="desc">QR-style payment code placeholder for LibraSpace GCash checkout.</desc>
+  <rect width="220" height="220" fill="#ffffff"/>
+  <path fill="#111827" d="M16 16h56v56H16zM28 28v32h32V28zM36 36h16v16H36zM148 16h56v56h-56zM160 28v32h32V28zM168 36h16v16h-16zM16 148h56v56H16zM28 160v32h32v-32zM36 168h16v16H36z"/>
+  <path fill="#111827" d="M88 16h12v12H88zM112 16h12v24h-12zM136 16h8v12h-8zM84 36h16v8H84zM108 48h12v12h-12zM128 40h16v20h-16zM84 64h8v16h-8zM100 72h20v8h-20zM132 68h12v12h-12zM80 92h12v12H80zM100 88h12v20h-12zM120 88h24v8h-24zM152 84h12v24h-12zM176 84h12v12h-12zM196 84h8v36h-8zM16 88h12v12H16zM40 84h24v8H40zM72 88h8v32h-8zM24 112h24v12H24zM56 108h12v24H56zM88 116h16v8H88zM116 108h8v24h-8zM132 112h20v12h-20zM164 116h24v8h-24zM84 136h20v12H84zM112 140h12v20h-12zM132 136h12v12h-12zM152 136h8v24h-8zM172 136h32v12h-32zM84 164h12v40H84zM104 168h16v12h-16zM128 160h16v16h-16zM152 168h12v12h-12zM176 160h12v12h-12zM196 160h8v44h-8zM104 192h24v12h-24zM140 188h20v16h-20zM168 184h20v12h-20z"/>
+  <rect x="82" y="82" width="56" height="56" rx="8" fill="#0f6df6"/>
+  <text x="110" y="107" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#ffffff">GCash</text>
+  <text x="110" y="124" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" fill="#dbeafe">LibraSpace</text>
+</svg>
