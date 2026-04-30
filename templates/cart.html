@@ -16,7 +16,7 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
         .grid-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-image: linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px); background-size: 60px 60px; }
 
-        main { flex: 1; padding: 40px 40px 40px; max-width: 860px; position: relative; z-index: 1; }
+        main { flex: 1; padding: 90px 40px 40px; max-width: 860px; position: relative; z-index: 1; }
 
         .page-header { margin-bottom: 32px; }
         .page-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--text); }
@@ -60,7 +60,7 @@
         .cart-summary {
             background: var(--surface); border: 1px solid var(--border);
             border-radius: 12px; padding: 24px;
-            position: sticky; top: 20px;
+            position: sticky; top: 82px;
         }
         .summary-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 20px; }
 
@@ -100,7 +100,7 @@
         .footer-links a:hover { color: var(--gold); }
 
         @media (max-width: 900px) {
-            main { padding: 24px 20px; margin-left: 0; }
+            main { padding: 82px 20px 24px; margin-left: 0; }
             .cart-layout { grid-template-columns: 1fr; }
             footer { padding: 36px 24px 20px; }
             .footer-top { flex-direction: column; }
