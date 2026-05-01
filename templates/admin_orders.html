@@ -65,9 +65,16 @@
         .status-cancelled { background: rgba(239,68,68,0.08);  border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
         .status-select { background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-size: 0.78rem; padding: 5px 8px; font-family: 'Inter', sans-serif; cursor: pointer; outline: none; }
         .status-select:focus { border-color: var(--gold); }
-        .update-btn { padding: 5px 12px; background: var(--gold); border: none; border-radius: 6px; color: #070e1a; font-size: 0.75rem; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.2s; }
-        .update-btn:hover { background: var(--gold-light); }
         .empty { text-align: center; padding: 60px; color: var(--text-muted); font-size: 0.9rem; }
+        .bulk-bar { display: flex; justify-content: flex-end; align-items: center; gap: 14px; padding: 16px 20px; border-top: 1px solid var(--border); background: var(--surface2); }
+        .save-all-btn { padding: 9px 22px; background: var(--gold); border: none; border-radius: 8px; color: #070e1a; font-size: 0.82rem; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.2s; }
+        .save-all-btn:hover { background: var(--gold-light); }
+        .save-all-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .changed-dot { display: inline-block; width: 7px; height: 7px; background: var(--gold); border-radius: 50%; margin-left: 6px; vertical-align: middle; }
+        .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: #0f2a1a; border: 1px solid #4ade80; color: #86efac; padding: 11px 22px; border-radius: 10px; font-size: 0.83rem; font-weight: 600; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 9999; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.error { background: #2a0f0f; border-color: #ef4444; color: #fca5a5; }
+        .status-select.is-changed { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.18); }
         @media (max-width: 900px) { .sidebar { display: none; } main { margin-left: 0; padding: 20px 16px; } }
     </style>
 </head>
@@ -119,7 +126,7 @@
                             <th>Price</th>
                             <th>Date</th>
                             <th>Status</th>
-                            <th>Update</th>
+                            <th>Update Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -131,7 +138,7 @@
                             <td style="color:var(--gold);font-weight:600;">₱{{ "%.2f"|format(book.price|float) }}</td>
                             <td style="color:var(--text-muted);font-size:0.75rem;">{{ book.ordered_at[:10] if book.ordered_at else '—' }}</td>
                             <td>
-                                <span class="status-badge status-{{ book.status or 'pending' }}">
+                                <span class="status-badge status-{{ book.status or 'pending' }}" id="badge-{{ book.order_id }}">
                                     {% set s = book.status or 'pending' %}
                                     {% if s == 'pending' %}⏳ Pending
                                     {% elif s == 'shipped' %}🚚 Shipped
@@ -141,20 +148,23 @@
                                 </span>
                             </td>
                             <td>
-                                <form method="POST" action="/admin/order/{{ book.order_id }}/status" style="display:flex;gap:6px;align-items:center;">
-                                    <select name="status" class="status-select">
-                                        <option value="pending"   {% if (book.status or 'pending') == 'pending'   %}selected{% endif %}>⏳ Pending</option>
-                                        <option value="shipped"   {% if book.status == 'shipped'   %}selected{% endif %}>🚚 Shipped</option>
-                                        <option value="delivered" {% if book.status == 'delivered' %}selected{% endif %}>✅ Delivered</option>
-                                        <option value="cancelled" {% if book.status == 'cancelled' %}selected{% endif %}>✕ Cancelled</option>
-                                    </select>
-                                    <button type="submit" class="update-btn">Save</button>
-                                </form>
+                                <select name="status" class="status-select"
+                                    data-order-id="{{ book.order_id }}"
+                                    data-original="{{ book.status or 'pending' }}">
+                                    <option value="pending"   {% if (book.status or 'pending') == 'pending'   %}selected{% endif %}>⏳ Pending</option>
+                                    <option value="shipped"   {% if book.status == 'shipped'   %}selected{% endif %}>🚚 Shipped</option>
+                                    <option value="delivered" {% if book.status == 'delivered' %}selected{% endif %}>✅ Delivered</option>
+                                    <option value="cancelled" {% if book.status == 'cancelled' %}selected{% endif %}>✕ Cancelled</option>
+                                </select>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <div class="bulk-bar">
+                    <span id="changeCount" style="font-size:0.78rem;color:var(--text-muted);"></span>
+                    <button class="save-all-btn" id="saveAllBtn" disabled>Save All Changes</button>
+                </div>
                 {% else %}
                 <div class="empty">No orders yet.</div>
                 {% endif %}
@@ -168,6 +178,8 @@
         <div class="notif-popup-msg" id="notifMsg"></div>
         <a href="#" class="notif-popup-link" id="notifLink">View →</a>
     </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
         (function(){
@@ -209,6 +221,79 @@
             close.addEventListener('click', () => popup.style.display='none');
             check(); setInterval(check, 30000);
         })();
+
+        // ── Bulk status logic ──
+        const statusLabels = { pending: '⏳ Pending', shipped: '🚚 Shipped', delivered: '✅ Delivered', cancelled: '✕ Cancelled' };
+        const badgeClasses = { pending: 'status-pending', shipped: 'status-shipped', delivered: 'status-delivered', cancelled: 'status-cancelled' };
+        const changes = {};
+        const saveBtn = document.getElementById('saveAllBtn');
+        const changeCount = document.getElementById('changeCount');
+        const toast = document.getElementById('toast');
+
+        function showToast(msg, isError) {
+            toast.textContent = msg;
+            toast.className = 'toast' + (isError ? ' error' : '') + ' show';
+            setTimeout(() => toast.className = 'toast' + (isError ? ' error' : ''), 3200);
+        }
+
+        function updateUI() {
+            const n = Object.keys(changes).length;
+            saveBtn.disabled = n === 0;
+            changeCount.textContent = n > 0 ? `${n} unsaved change${n > 1 ? 's' : ''}` : '';
+        }
+
+        document.querySelectorAll('.status-select').forEach(function(sel) {
+            sel.addEventListener('change', function() {
+                const id = this.dataset.orderId;
+                const orig = this.dataset.original;
+                if (this.value !== orig) {
+                    changes[id] = this.value;
+                    this.classList.add('is-changed');
+                } else {
+                    delete changes[id];
+                    this.classList.remove('is-changed');
+                }
+                updateUI();
+            });
+        });
+
+        saveBtn.addEventListener('click', function() {
+            const updates = Object.entries(changes).map(([order_id, status]) => ({ order_id: parseInt(order_id), status }));
+            if (!updates.length) return;
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            fetch('/admin/orders/bulk-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ updates })
+            })
+            .then(r => r.json())
+            .then(function(data) {
+                if (data.success) {
+                    updates.forEach(function(u) {
+                        const sel = document.querySelector(`.status-select[data-order-id="${u.order_id}"]`);
+                        if (sel) {
+                            sel.dataset.original = u.status;
+                            sel.classList.remove('is-changed');
+                        }
+                        const badge = document.getElementById('badge-' + u.order_id);
+                        if (badge) {
+                            badge.className = 'status-badge ' + (badgeClasses[u.status] || '');
+                            badge.textContent = statusLabels[u.status] || u.status;
+                        }
+                        delete changes[u.order_id];
+                    });
+                    showToast('✅ All changes saved successfully');
+                } else {
+                    showToast('❌ ' + (data.error || 'Failed to save changes'), true);
+                }
+            })
+            .catch(function() { showToast('❌ Network error. Please try again.', true); })
+            .finally(function() {
+                saveBtn.textContent = 'Save All Changes';
+                updateUI();
+            });
+        });
     </script>
 </body>
 </html>

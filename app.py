@@ -1481,5 +1481,30 @@ def admin_order_status(order_id):
     return redirect(request.referrer or '/admin')
 
 
+@app.route('/admin/orders/bulk-status', methods=['POST'])
+def admin_orders_bulk_status():
+    from flask import jsonify
+    redir = admin_required()
+    if redir: return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    data = request.get_json() or {}
+    updates = data.get('updates', [])
+    valid_statuses = {'pending', 'shipped', 'delivered', 'cancelled'}
+    errors = []
+    for item in updates:
+        order_id = item.get('order_id')
+        status = item.get('status', '').strip()
+        if not order_id or status not in valid_statuses:
+            errors.append(order_id)
+            continue
+        try:
+            db_patch('orders', {'status': status}, {'id': f'eq.{order_id}'})
+        except Exception as e:
+            print(f'Bulk status update error for order {order_id}:', e)
+            errors.append(order_id)
+    if errors:
+        return jsonify({'success': False, 'error': f'Failed to update order(s): {errors}'}), 500
+    return jsonify({'success': True})
+
+
 if __name__ == '__main__':
     app.run(debug=os.getenv('FLASK_DEBUG', 'false').lower() == 'true')
