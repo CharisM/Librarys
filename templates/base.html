@@ -333,5 +333,30 @@
         </div>
     </footer>
 
+    {% if contact_prefill.name or contact_prefill.email %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const contactName = {{ contact_prefill.name|tojson }};
+            const contactEmail = {{ contact_prefill.email|tojson }};
+            const nameSelectors = [
+                'input[name="name"]',
+                'input[name="fullname"]',
+                'input[name="full_name"]',
+                'input[name="fullName"]'
+            ];
+
+            nameSelectors.forEach(function (selector) {
+                document.querySelectorAll(selector).forEach(function (input) {
+                    if (!input.value && contactName) input.value = contactName;
+                });
+            });
+
+            document.querySelectorAll('input[name="email"]').forEach(function (input) {
+                if (!input.value && contactEmail) input.value = contactEmail;
+            });
+        });
+    </script>
+    {% endif %}
+
 </body>
 </html>

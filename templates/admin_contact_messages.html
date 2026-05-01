@@ -75,6 +75,35 @@
         .btn-read:hover { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.6); }
         .read-label { font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
         .empty { text-align: center; padding: 60px; color: var(--text-muted); font-size: 0.9rem; }
+
+        /* REPLY */
+        .reply-section { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+        .reply-sent {
+            display: flex; gap: 10px; align-items: flex-start;
+            background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.2);
+            border-radius: 8px; padding: 12px 14px;
+        }
+        .reply-sent-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+        .reply-sent-label { font-size: 0.68rem; font-weight: 700; color: #4ade80; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 4px; }
+        .reply-sent-body { font-size: 0.84rem; color: var(--text-soft); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+        .reply-form textarea {
+            width: 100%; padding: 10px 13px;
+            background: var(--surface2); border: 1px solid var(--border2);
+            border-radius: 8px; color: var(--text);
+            font-size: 0.84rem; font-family: 'Inter', sans-serif;
+            resize: vertical; min-height: 80px; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .reply-form textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1); }
+        .reply-form-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 12px; }
+        .reply-hint { font-size: 0.72rem; color: var(--text-muted); }
+        .btn-reply {
+            padding: 7px 20px; background: var(--gold); border: none; border-radius: 7px;
+            color: #0a1628; font-size: 0.8rem; font-weight: 700;
+            font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-reply:hover { background: var(--gold-light); transform: translateY(-1px); }
+
         @media (max-width: 900px) { .sidebar { display: none; } main { margin-left: 0; padding: 20px 16px; } }
     </style>
 </head>
@@ -116,6 +145,12 @@
             <div class="page-title">Contact <span>Messages</span></div>
             <div class="page-sub">{{ messages | length }} message{{ 's' if messages | length != 1 }} — {{ messages | selectattr('is_read', 'equalto', false) | list | length }} unread</div>
 
+            {% if fetch_error %}
+            <div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:0.85rem;color:#fca5a5;">
+                ⚠️ <strong>Database error:</strong> {{ fetch_error }}
+            </div>
+            {% endif %}
+
             {% if messages %}
             <div class="msg-list">
                 {% for m in messages %}
@@ -139,6 +174,26 @@
                         </form>
                         {% else %}
                         <div class="read-label">✓ Read</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="reply-section">
+                        {% if m.admin_reply %}
+                        <div class="reply-sent">
+                            <div class="reply-sent-icon">↩️</div>
+                            <div>
+                                <div class="reply-sent-label">Reply sent</div>
+                                <div class="reply-sent-body">{{ m.admin_reply }}</div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <form method="POST" action="/admin/contact-messages/{{ m.id }}/reply" class="reply-form">
+                            <textarea name="reply" placeholder="Write your reply to {{ m.name }}…" required minlength="5"></textarea>
+                            <div class="reply-form-row">
+                                <span class="reply-hint">Will be sent to {{ m.email }}</span>
+                                <button type="submit" class="btn-reply">Send Reply ↗</button>
+                            </div>
+                        </form>
                         {% endif %}
                     </div>
                 </div>

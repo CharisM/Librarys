@@ -80,6 +80,33 @@
 
 .form-group { margin-bottom: 18px; }
 
+.sender-note {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.22);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+}
+
+.sender-note-icon {
+    width: 34px; height: 34px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(201,168,76,0.12);
+    border-radius: 8px;
+}
+
+.sender-note-label {
+    font-size: 0.68rem; font-weight: 700;
+    color: var(--gold); text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 2px;
+}
+
+.sender-note-value {
+    font-size: 0.84rem; color: var(--text);
+    overflow-wrap: anywhere;
+}
+
 label {
     display: block; font-size: 0.72rem; font-weight: 600;
     color: var(--text-soft); margin-bottom: 7px;
@@ -149,6 +176,22 @@ input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shado
 .btn-back { display: inline-block; padding: 11px 28px; background: transparent; border: 1px solid var(--border2); border-radius: 8px; color: var(--text-soft); font-size: 0.875rem; text-decoration: none; transition: all 0.2s; }
 .btn-back:hover { border-color: var(--gold); color: var(--gold); }
 
+/* LOGIN GATE */
+.login-gate {
+    display: none;
+    background: rgba(248,113,113,0.07);
+    border: 1px solid rgba(248,113,113,0.28);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    align-items: center; gap: 14px;
+}
+.login-gate.visible { display: flex; animation: fadeInUp 0.25s ease both; }
+.login-gate-icon { font-size: 1.3rem; flex-shrink: 0; }
+.login-gate-text { font-size: 0.875rem; color: #fca5a5; flex: 1; line-height: 1.5; }
+.login-gate-text a { color: var(--gold); font-weight: 600; text-decoration: none; }
+.login-gate-text a:hover { text-decoration: underline; }
+
 @media (max-width: 900px) {
     .page-wrap { padding: 60px 24px; }
     .contact-layout { grid-template-columns: 1fr; }
@@ -215,21 +258,21 @@ input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shado
             <div class="alert alert-error">{{ error }}</div>
             {% endif %}
 
-            <form method="POST">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <div class="input-wrap">
-                            <span class="input-icon">👤</span>
-                            <input type="text" name="name" placeholder="Your name" value="{{ form.name if form else '' }}" required>
-                        </div>
+            <form method="POST" id="contact-form">
+                {% if is_logged_in %}
+                <div class="sender-note">
+                    <div class="sender-note-icon">👤</div>
+                    <div>
+                        <div class="sender-note-label">Sending as</div>
+                        <div class="sender-note-value">{{ form.name or 'Registered User' }} &lt;{{ form.email }}&gt;</div>
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <div class="input-wrap">
-                            <span class="input-icon">📧</span>
-                            <input type="email" name="email" placeholder="your@email.com" value="{{ form.email if form else '' }}" required>
-                        </div>
+                </div>
+                {% endif %}
+
+                <div class="login-gate" id="login-gate">
+                    <div class="login-gate-icon">🔒</div>
+                    <div class="login-gate-text">
+                        Please <a href="/login">log in</a> first to send a message.
                     </div>
                 </div>
 
@@ -257,6 +300,18 @@ input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shado
 
                 <button type="submit" class="submit-btn">Send Message →</button>
             </form>
+
+            <script>
+            (function () {
+                var loggedIn = {{ 'true' if is_logged_in else 'false' }};
+                if (loggedIn) return;
+                document.getElementById('contact-form').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    document.getElementById('login-gate').classList.add('visible');
+                    document.getElementById('login-gate').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            })();
+            </script>
             {% endif %}
         </div>
 

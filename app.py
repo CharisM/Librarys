@@ -317,14 +317,58 @@ def send_contact_email(name, sender_email, subject, message_body):
 
 
 def save_contact_message(name, email, subject, message_body):
+    db_post('contact_messages', {
+        'name': name, 'email': email,
+        'subject': subject, 'message': message_body,
+        'is_read': False
+    })
+
+
+def send_reply_email(to_name, to_email, original_subject, reply_body):
+    config_error = mail_config_error()
+    if config_error:
+        raise RuntimeError(config_error)
+    msg = Message(
+        subject=f"Re: {original_subject} — LibraSpace Support",
+        recipients=[to_email]
+    )
+    msg.body = (
+        f"Hi {to_name},\n\n"
+        f"{reply_body}\n\n"
+        "— LibraSpace Support Team"
+    )
+    mail.send(msg)
+
+
+def contact_form_defaults():
+    form = {
+        'name': '',
+        'email': '',
+        'subject': 'General Inquiry',
+        'message': '',
+    }
+    user_id = session.get('user_id')
+    if not user_id:
+        return form
+    form['name'] = session.get('username', '') or ''
+    form['email'] = session.get('email', '') or ''
+    if form['name'] and form['email']:
+        return form
     try:
-        db_post('contact_messages', {
-            'name': name, 'email': email,
-            'subject': subject, 'message': message_body,
-            'is_read': False
-        })
+        users = db_get('users', {'id': f'eq.{user_id}'})
     except Exception as e:
-        print('save_contact_message error:', e)
+        print('contact_form_defaults error:', e)
+        return form
+    if users:
+        user = users[0]
+        form['name'] = user.get('username', '') or ''
+        form['email'] = user.get('email', '') or ''
+    return form
+
+
+@app.context_processor
+def inject_contact_prefill():
+    return {'contact_prefill': contact_form_defaults()}
 
 
 @app.route('/send-otp', methods=['POST'])
@@ -382,7 +426,13 @@ def home():
         books = apply_book_images(db_get('books'))
     except Exception:
         books = []
-    return render_template('index.html', active_page='home', featured_books=books[:10], force_guest_nav=True)
+    return render_template(
+        'index.html',
+        active_page='home',
+        featured_books=books[:10],
+        force_guest_nav=True,
+        form=contact_form_defaults()
+    )
 
 @app.route('/features')
 def features():
@@ -394,30 +444,37 @@ def about():
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
+    default_form = contact_form_defaults()
+    is_logged_in = bool(session.get('user_id'))
     if request.method == 'POST':
+        if not is_logged_in:
+            return render_template('contact.html', active_page='contact', sent=False,
+                error=None, form=default_form, is_logged_in=False)
         form = {
-            'name': request.form.get('name', '').strip(),
-            'email': request.form.get('email', '').strip(),
+            'name': default_form['name'],
+            'email': default_form['email'],
             'subject': request.form.get('subject', 'General Inquiry').strip(),
             'message': request.form.get('message', '').strip(),
         }
-        if not form['name'] or not form['email'] or len(form['message']) < 10:
-            return render_template(
-                'contact.html',
-                active_page='contact',
-                sent=False,
-                error='Please fill in your name, email, and a message with at least 10 characters.',
-                form=form
-            )
-        # Always save to DB
-        save_contact_message(form['name'], form['email'], form['subject'], form['message'])
-        # Try to send email (non-blocking)
+        if not form['name']:
+            form['name'] = form['email'].split('@')[0] or 'Registered User'
+        if len(form['message']) < 10:
+            return render_template('contact.html', active_page='contact', sent=False,
+                error='Please write a message with at least 10 characters.', form=form, is_logged_in=True)
+        try:
+            save_contact_message(form['name'], form['email'], form['subject'], form['message'])
+        except Exception as e:
+            print('save_contact_message error:', e)
+            return render_template('contact.html', active_page='contact', sent=False,
+                error=f'Could not save your message: {explain_supabase_error(e)}', form=form, is_logged_in=True)
         try:
             send_contact_email(form['name'], form['email'], form['subject'], form['message'])
         except Exception as e:
             print('Contact mail error (non-fatal):', e)
-        return render_template('contact.html', active_page='contact', sent=True, error=None, form={})
-    return render_template('contact.html', active_page='contact', sent=False, error=None, form={})
+        return render_template('contact.html', active_page='contact', sent=True, error=None,
+            form=default_form, is_logged_in=True)
+    return render_template('contact.html', active_page='contact', sent=False, error=None,
+        form=default_form, is_logged_in=is_logged_in)
 
 @app.route('/favicon.png')
 def favicon():
@@ -514,6 +571,8 @@ def login():
             if matched:
                 session.clear()
                 session['user_id'] = users[0]['id']
+                session['username'] = users[0].get('username', '')
+                session['email'] = users[0].get('email', '')
                 session.modified = True
                 return redirect('/dashboard')
             return render_template('login.html', **auth_page_context(error='Incorrect password.'))
@@ -905,6 +964,8 @@ def profile_username():
         result = db_patch('users', {'username': new_username}, {'id': f"eq.{session['user_id']}"})
         if not result:
             return profile_render(username_error='Update failed. This may be blocked by a database policy. Please contact support.')
+        session['username'] = new_username
+        session.modified = True
         return profile_render(username_success='Username updated successfully!')
     except Exception as e:
         print("Profile username error:", str(e))
@@ -943,6 +1004,8 @@ def profile_contact():
         if not email or not phone:
             return profile_render(contact_error='Email and phone are required.')
         db_patch('users', {'email': email, 'phone': phone}, {'id': f"eq.{session['user_id']}"})
+        session['email'] = email
+        session.modified = True
         return profile_render(contact_success='Contact info updated successfully!')
     except Exception as e:
         print("Profile contact error:", str(e))
@@ -1365,14 +1428,17 @@ def admin_contact_messages():
     redir = admin_required()
     if redir: return redir
     username = session.get('admin_username', 'Admin')
+    fetch_error = None
     try:
         messages = sorted(
             db_get('contact_messages'),
             key=lambda x: x.get('created_at', ''), reverse=True
         )
-    except Exception:
+    except Exception as e:
+        print('admin_contact_messages error:', e)
         messages = []
-    return render_template('admin_contact_messages.html', messages=messages, username=username)
+        fetch_error = explain_supabase_error(e)
+    return render_template('admin_contact_messages.html', messages=messages, username=username, fetch_error=fetch_error)
 
 
 @app.route('/admin/contact-messages/<int:msg_id>/read', methods=['POST'])
@@ -1383,6 +1449,25 @@ def admin_contact_mark_read(msg_id):
         db_patch('contact_messages', {'is_read': True}, {'id': f'eq.{msg_id}'})
     except Exception as e:
         print('mark read error:', e)
+    return redirect('/admin/contact-messages')
+
+
+@app.route('/admin/contact-messages/<int:msg_id>/reply', methods=['POST'])
+def admin_contact_reply(msg_id):
+    redir = admin_required()
+    if redir: return redir
+    reply_body = request.form.get('reply', '').strip()
+    if not reply_body:
+        return redirect('/admin/contact-messages')
+    try:
+        rows = db_get('contact_messages', {'id': f'eq.{msg_id}'})
+        if not rows:
+            return redirect('/admin/contact-messages')
+        msg = rows[0]
+        send_reply_email(msg['name'], msg['email'], msg['subject'], reply_body)
+        db_patch('contact_messages', {'is_read': True, 'admin_reply': reply_body}, {'id': f'eq.{msg_id}'})
+    except Exception as e:
+        print('admin_contact_reply error:', e)
     return redirect('/admin/contact-messages')
 
 
